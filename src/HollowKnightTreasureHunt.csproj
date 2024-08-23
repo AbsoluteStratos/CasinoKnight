@@ -18,7 +18,7 @@
     <Copyright>Copyright ©  2024</Copyright>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    <OutputPath>$(ExportDir\$(Configuration)\</OutputPath>
+    <OutputPath>$(ExportDir)\$(Configuration)\</OutputPath>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <Target Name="CopyMod" AfterTargets="PostBuildEvent">
@@ -323,6 +323,15 @@
     <Reference Include="UnityEngine.XRModule">
       <HintPath>$(HollowKnightRefs)/UnityEngine.XRModule.dll</HintPath>
     </Reference>
+	<Reference Include="Satchel">
+		<HintPath>$(HollowKnightRefs)/Mods/Satchel/Satchel.dll</HintPath>
+	</Reference>
+	<Reference Include="FrogCore">
+		<HintPath>$(HollowKnightRefs)/Mods/FrogCore/FrogCore.dll</HintPath>
+	</Reference>
+  </ItemGroup>
+  <ItemGroup>
+      <EmbeddedResource Include="Resources\*" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

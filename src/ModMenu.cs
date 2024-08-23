@@ -9,78 +9,30 @@ using System;
 using UnityEngine;
 using MenuButton = Satchel.BetterMenus.MenuButton;
 using InControl;
+using StratosLogging;
 
-namespace StudyKnight
+namespace HollowKnightTreasureHunt
 {
     public static class ModMenu
     {
-        public static MappableKey myKey;
-        public static InControl.PlayerAction Action;
 
-        // This is based on the debug UI menu
-        // https://github.com/TheMulhima/HollowKnight.DebugMod/blob/master/Source/ModMenu.cs#L12
-        // Typically people use Satchel to not deal with this complexity
-        // https://prashantmohta.github.io/ModdingDocs/Satchel/BetterMenus/better-menus.html
-        public static MenuBuilder CreateMenuScreen(MenuScreen modListMenu)
+        public static MenuScreen GetMenuScreen(Menu MenuRef, MenuScreen modListMenu, ModToggleDelegates? modtoggledelegates)
         {
-            Action<MenuSelectable> CancelAction = selectable => UIManager.instance.UIGoToDynamicMenu(modListMenu);
-            return new MenuBuilder(UIManager.instance.UICanvas.gameObject, "Fart Knight Menu")
-                .CreateTitle("Fart Knight Menu", MenuTitleStyle.vanillaStyle)
-                .CreateContentPane(RectTransformData.FromSizeAndPos(
-                    new RelVector2(new Vector2(1920f, 903f)),
-                    new AnchoredPosition(
-                        new Vector2(0.5f, 0.5f),
-                        new Vector2(0.5f, 0.5f),
-                        new Vector2(0f, -60f)
-                    )
-                ))
-                .CreateControlPane(RectTransformData.FromSizeAndPos(
-                    new RelVector2(new Vector2(1920f, 259f)),
-                    new AnchoredPosition(
-                        new Vector2(0.5f, 0.5f),
-                        new Vector2(0.5f, 0.5f),
-                        new Vector2(0f, -502f)
-                    )
-                ))
-                .SetDefaultNavGraph(new GridNavGraph(1))
-                .AddContent(
-                    RegularGridLayout.CreateVerticalLayout(105f),
-                    c =>
-                    {
-                        c.AddKeybind(
-                                "Scrub Key",
-                                StudyKnight.GS.KeyBinds.ScrubScene,
-                                new KeybindConfig
-                                {
-                                    Label = "Scrub Key"
-                                },
-                                out var myKey
-                            )
-                        .AddKeybind(
-                                "Study Animation Key",
-                                StudyKnight.GS.KeyBinds.StudyAnimation,
-                                new KeybindConfig
-                                {
-                                    Label = "Study Key"
-                                },
-                                out var myKey2
-                            );
-                    })
-                .AddControls(
-                    new SingleContentLayout(new AnchoredPosition(
-                        new Vector2(0.5f, 0.5f),
-                        new Vector2(0.5f, 0.5f),
-                        new Vector2(0f, -64f)
-                    )), c => c.AddMenuButton(
-                        "BackButton",
-                        new MenuButtonConfig
+            //Create a new MenuRef if it's not null
+            MenuRef ??= new Menu(
+                        name: "Treasure Hunt", //the title of the menu screen, it will appear on the top center of the screen 
+                        elements: new Element[]
                         {
-                            Label = "Back",
-                            CancelAction = _ => UIManager.instance.UIGoToDynamicMenu(modListMenu),
-                            SubmitAction = _ => UIManager.instance.UIGoToDynamicMenu(modListMenu),
-                            Style = MenuButtonStyle.VanillaStyle,
-                            Proceed = true
-                        }));
+                            new MenuButton(
+                            name: "My Logging Button",
+                            description: "A menu button",
+                            submitAction: (_) => Log.Info("A button was pressed")),
+                        }
+            );
+
+            //uses the GetMenuScreen function to return a menuscreen that MAPI can use. 
+            //The "modlistmenu" that is passed into the parameter can be any menuScreen that you want to return to when "Back" button or "esc" key is pressed 
+            return MenuRef.GetMenuScreen(modListMenu);
         }
     }
 }
