@@ -12,31 +12,25 @@ using Satchel;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using HutongGames.PlayMaker.Actions;
+using GlobalEnums;
+using static Satchel.SceneUtils;
+using static Mono.Security.X509.X520;
 
 namespace HollowKnightTreasureHunt
 {
     public class HollowKnightTreasureHunt : Mod, ICustomMenuMod
     {
-
-        public Dictionary<string, AssetBundle> Bundles { get; } = new();
-
         private Menu MenuRef;
 
         internal static HollowKnightTreasureHunt Instance;
 
-        private AssetBundle ab = null; // Global
-
-
-        private GameObject mySprite;
-
-        private GameObject objab;
-
-        private Tk2dPlayAnimation exitDoor;
-
-        private CasinoShopHandler casino;
-
         public GameObject CardPrefab;
         public Dictionary<string, Dictionary<string, GameObject>> preloads;
+        public static Satchel.Core SatchelCore = new Satchel.Core();
+
+        public Satchel.CustomScene casinoInterior;
+        public static AssetBundle casinoScene;
+        public string sceneName;
         //public override List<ValueTuple<string, string>> GetPreloadNames()
         //{
         //    return new List<ValueTuple<string, string>>
@@ -69,9 +63,67 @@ namespace HollowKnightTreasureHunt
             CardPrefab = preloads["Cliffs_01"]["Cornifer Card"];
             CustomArrowPrompt.Prepare(CardPrefab);
 
-            StratosLogging.Log.Warning(CustomArrowPrompt.ArrowPromptPrefab.name);
+
+
+            string name = "HollowKnightTreasureHunt.Resources.casinoscene";
+            Assembly asm = Assembly.GetExecutingAssembly();
+            using (Stream s = asm.GetManifestResourceStream(name))
+            {
+                byte[] buffer = new byte[s.Length];
+                s.Read(buffer, 0, buffer.Length);
+                s.Dispose();
+                Log("Loading bundle: " + name);
+                casinoScene = AssetBundle.LoadFromMemory(buffer);
+            }
+
+            StratosLogging.Log.Info("=====>" + casinoScene.GetAllScenePaths()[0]);
+
+            sceneName = casinoScene.GetAllScenePaths()[0];
+
+            casinoInterior = SatchelCore.GetCustomScene("CasinoScene", preloads["Room_mapper"]["TileMap"], preloads["Room_mapper"]["_SceneManager"]);
+
+
+
+            CustomSceneManagerSettings settings = new SceneUtils.CustomSceneManagerSettings(preloads["Room_mapper"]["_SceneManager"].GetComponent<SceneManager>());
+            casinoInterior.Config(5, 5, settings);
+
+            // https://github.com/PrashantMohta/Satchel/blob/master/Utils/SceneUtils.cs#L144
+            casinoInterior.AddGateway(new GatewayParams {
+                    gateName = "left_01",
+                    pos = new Vector2(0f, 0.2f),
+                    size = new Vector2(0.1f, 0.2f),
+                    fromScene = "CasinoScene",
+                    toScene = "Town",
+                    entryGate = "right_02",
+                    respawnPoint = new Vector2(1f, 0.2f),
+                    onlyOut = false,
+                    vis = GameManager.SceneLoadVisualizations.Default
+                });
+
+            casinoInterior.OnLoaded += TestOnload;
+
+
+
+            foreach (UnityEngine.SceneManagement.Scene scene in UnityEngine.SceneManagement.SceneManager.GetAllScenes())
+            {
+                StratosLogging.Log.Info("Scene" + scene.name);
+            }
+            // UnityEngine.SceneManagement.SceneManager.LoadScene();
 
             StratosLogging.Log.Info("Loaded!!!");
+
+        }
+
+        private IEnumerator PlayExitAnimation()
+        {
+            
+
+            yield break;
+        }
+
+        private void TestOnload(object sender, SceneLoadedEventArgs e)
+        {
+            StratosLogging.Log.Warning("Loading complete");
         }
 
         // https://prashantmohta.github.io/ModdingDocs/preloads.html#how-to-preload-an-object
@@ -80,6 +132,9 @@ namespace HollowKnightTreasureHunt
             return new List<(string, string)>
             {
                 ("Cliffs_01","Cornifer Card"),
+                ("Room_mapper","TileMap"),
+                ("Room_mapper","TileMap Render Data"),
+                ("Room_mapper","_SceneManager"),
             };
         }
 
@@ -87,121 +142,43 @@ namespace HollowKnightTreasureHunt
         private void OnHeroControllerAwake(On.HeroController.orig_Awake orig, HeroController self)
         {
             orig.Invoke(self);
-            casino = self.gameObject.GetAddComponent<CasinoShopHandler>();
+
+            // Attach to hero for now
+            GameManager.instance.gameObject.AddComponent<CasinoShopHandler>();
+
+            // GameManager.instance.gameObject.AddComponent<CasinoInteriorHandler>();
+
+            
         }
 
         public void OnHeroUpdate()
         {
-
-            casino.OnHeroUpdate();
+            // casino.OnHeroUpdate();
             // Here we use the Player Action to detect the input
             // This WasPressed is defined in the subclass `OneAxisInputControl`
             if (Input.GetKeyDown(KeyCode.O))
             {
-
+                
 
                 Log("Key Pressed");
-
+                GameManager.instance.BeginSceneTransition(new GameManager.SceneLoadInfo
+                {
+                    SceneName = "CasinoScene",
+                    EntryGateName = "left_01",
+                    HeroLeaveDirection = GatePosition.bottom,
+                    EntryDelay = 0.2f,
+                    WaitForSceneTransitionCameraFade = true,
+                    PreventCameraFadeOut = false,
+                    Visualization = GameManager.SceneLoadVisualizations.Default,
+                    AlwaysUnloadUnusedAssets = false,
+                    forceWaitFetch = false
+                });
+                Log("Transition here");
                 //HeroController.instance.StartCoroutine(PlayExitAnimation());
-
-            }
-
-
-        }
-
-        public void OnSceneChange(Scene scene_1, Scene scene_2)
-        {
-
-            TransitionPoint[] transions = UnityEngine.Object.FindObjectsOfType<TransitionPoint>();
-            foreach (TransitionPoint tobj in transions)
-            {
-                StratosLogging.Log.Info(tobj.name + " to: " + tobj.targetScene + " _ " + tobj.entryPoint);
-            }
-
-            
-
-
-            StratosLogging.Log.Info("Scene changed!! " + scene_1.name + " to " + scene_2.name);
-            if (scene_2.name == "Town")
-            {
-                string bundle_name = "HollowKnightTreasureHunt.Resources.stratos";
-                
-                if (ab == null)
-                {
-                    Assembly asm = Assembly.GetExecutingAssembly();
-                    using (Stream s = asm.GetManifestResourceStream(bundle_name))
-                    {
-                        byte[] buffer = new byte[s.Length];
-                        s.Read(buffer, 0, buffer.Length);
-                        s.Dispose();
-                        Log("Loading bundle: " + bundle_name);
-                        ab = AssetBundle.LoadFromMemory(buffer);
-                    }
-                    // Debugging
-                    foreach (string name in asm.GetManifestResourceNames())
-                    {
-                        StratosLogging.Log.Info("Embedded resource: " + name);
-                    }
-
-                    foreach (string name in ab.GetAllAssetNames())
-                    {
-                        StratosLogging.Log.Info("Asset: " + name);
-                    }
-                }
-
-                // Note the path is based on where you saved the prefab
-                objab = ab.LoadAsset<GameObject>("Assets/Images/stratos.prefab");
-                objab = GameObject.Instantiate(objab);
-                objab.transform.position = Vector3.zero;
-                objab.SetActive(true);
-
-                for (int i = 0; i < objab.transform.childCount; i++)
-                {
-                    GameObject child = objab.transform.GetChild(i).gameObject;
-                    child.GetComponent<SpriteRenderer>().material = new Material(Shader.Find("Sprites/Default"));
-                    for (int j = 0; j < child.transform.childCount; j++)
-                    {
-                        GameObject child2 = child.transform.GetChild(i).gameObject;
-                        child2.GetComponent<SpriteRenderer>().material = new Material(Shader.Find("Sprites/Default"));
-                    }
-                }
-
-                // Add a transition hook door collider
-                GameObject gate = objab.transform.Find("Casino").gameObject.transform.Find("door_casino").gameObject;
-                StratosLogging.Log.Warning(gate.name);
-
-                var tp = gate.AddComponent<TransitionPoint>();
-           
-                /*var bc = gate.AddComponent<BoxCollider2D>();
-                bc.size = new Vector2(1f, 4f);
-                bc.isTrigger = true;*/
-                tp.isADoor = true;
-                tp.targetScene = "Crossroads_01";
-                tp.entryPoint = "top1";
-
-                PlayMakerFSM fsm = gate.AddComponent<PlayMakerFSM>();
-                
-
-
-
-                //tp.alwaysEnterLeft = true;
-                //tp.alwaysEnterRight = false;
-
-                GameObject rm = objab.transform.Find("Casino").gameObject.transform.Find("Hazard Respawn Marker").gameObject;
-                tp.respawnMarker = rm.AddComponent<HazardRespawnMarker>();
-                tp.sceneLoadVisualization = GameManager.SceneLoadVisualizations.Dream;
-
-                StratosLogging.Log.Warning("Gate Set up");
-
-
-
-
-            } else {
-                StratosLogging.Log.Info("Unloading asset");
-                ab.Unload(true);
             }
         }
 
+        // https://github.com/PaleCourt/PaleCourt/blob/34810397854390ce9c8b3a9cd95c09f6bf768887/Misc/AbyssalTemple.cs#L548
         private static void CreateGateway(string gateName, Vector2 pos, Vector2 size, string toScene, string entryGate,
                                   bool right, bool left, bool onlyOut, GameManager.SceneLoadVisualizations vis)
         {
@@ -226,9 +203,6 @@ namespace HollowKnightTreasureHunt
             tp.sceneLoadVisualization = vis;
         }
 
-
-        
-
         IEnumerator ExampleCoroutine()
         {
             //Print the time of when the function is first called.
@@ -239,25 +213,6 @@ namespace HollowKnightTreasureHunt
 
             //After we have waited 5 seconds print the time again.
             Debug.Log("Finished Coroutine at timestamp : " + Time.time);
-        }
-
-        private IEnumerator PlayExitAnimation()
-        {
-            tk2dSpriteAnimator _anim = HeroController.instance.GetComponent<tk2dSpriteAnimator>();
-
-            foreach (tk2dSpriteAnimationClip clip in _anim.Library.clips)
-            {
-                StratosLogging.Log.Warning(clip.name);
-                // yield return new WaitForSeconds(0.2f);
-            }
-
-            HeroController.instance.StopAnimationControl();
-
-            yield return _anim.PlayAnimWait("Enter");
-
-            HeroController.instance.StartAnimationControl();
-
-            yield break;
         }
 
         /// <summary>
