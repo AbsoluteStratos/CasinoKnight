@@ -88,12 +88,8 @@ namespace HollowKnightTreasureHunt
         private void OnHeroControllerAwake(On.HeroController.orig_Awake orig, HeroController self)
         {
             orig.Invoke(self);
-
-            // Attach to hero for now
+            // Attach the casino manager to the GameManager
             var shop = GameManager.instance.gameObject.GetAddComponent<CasinoShopHandler>();
-
-            // Attach the enter hero call back
-            On.GameManager.EnterHero += shop.EnterHero;
         }
 
         public void OnHeroUpdate()
@@ -103,7 +99,7 @@ namespace HollowKnightTreasureHunt
             // This WasPressed is defined in the subclass `OneAxisInputControl`
             if (Input.GetKeyDown(KeyCode.O))
             {
-                Log("Key Pressed");
+                // Quick jump to casino for testing, remove
                 GameManager.instance.BeginSceneTransition(new GameManager.SceneLoadInfo
                 {
                     SceneName = "CasinoScene",
@@ -116,34 +112,7 @@ namespace HollowKnightTreasureHunt
                     AlwaysUnloadUnusedAssets = false,
                     forceWaitFetch = false
                 });
-                Log("Transition here");
-                //HeroController.instance.StartCoroutine(PlayExitAnimation());
             }
-        }
-
-        // https://github.com/PaleCourt/PaleCourt/blob/34810397854390ce9c8b3a9cd95c09f6bf768887/Misc/AbyssalTemple.cs#L548
-        private static void CreateGateway(string gateName, Vector2 pos, Vector2 size, string toScene, string entryGate,
-                                  bool right, bool left, bool onlyOut, GameManager.SceneLoadVisualizations vis)
-        {
-            GameObject gate = new GameObject(gateName);
-            gate.transform.SetPosition2D(pos);
-            var tp = gate.AddComponent<TransitionPoint>();
-            if (!onlyOut)
-            {
-                var bc = gate.AddComponent<BoxCollider2D>();
-                bc.size = size;
-                bc.isTrigger = true;
-                tp.targetScene = toScene;
-                tp.entryPoint = entryGate;
-            }
-            tp.alwaysEnterLeft = left;
-            tp.alwaysEnterRight = right;
-            GameObject rm = new GameObject("Hazard Respawn Marker");
-            rm.transform.parent = gate.transform;
-            rm.tag = "RespawnPoint";
-            rm.transform.SetPosition2D(pos);
-            tp.respawnMarker = rm.AddComponent<HazardRespawnMarker>();
-            tp.sceneLoadVisualization = vis;
         }
 
         IEnumerator ExampleCoroutine()

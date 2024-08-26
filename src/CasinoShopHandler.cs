@@ -56,22 +56,6 @@ namespace HollowKnightTreasureHunt
             }
         }
 
-        public void EnterHero(On.GameManager.orig_EnterHero orig, GameManager self, bool additiveGateSearch)
-        {
-            orig.Invoke(self, additiveGateSearch);
-
-            if (previousScene == "CasinoScene")
-            {
-                var respawn = GameObject.Find("Casino/door_casino/Hazard Respawn Marker");
-                if (respawn != null)
-                {
-                    // Found 8.4 by printing out knight position every update in scene
-                    UnityEngine.Vector3 pos = respawn.gameObject.transform.position;
-                    // HeroController.instance.transform.position = new UnityEngine.Vector3(pos.x, 8.4f, 0f);
-                }
-            }
-        }
-
         public void OnSceneChange(Scene from, Scene to)
         {
 
@@ -116,8 +100,6 @@ namespace HollowKnightTreasureHunt
                 gate.AddComponent<CasinoTownDoorHanlder>();
                 var tp = gate.AddComponent<TransitionPoint>();
                 tp.isADoor = true;
-                //tp.targetScene = "Crossroads_01";
-                //tp.entryPoint = "top1";
                 tp.alwaysEnterLeft = false;
                 tp.alwaysEnterRight = false;
 

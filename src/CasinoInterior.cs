@@ -32,7 +32,7 @@ namespace HollowKnightTreasureHunt
 
         public CasinoInterior(GameObject refTileMap, GameObject refSceneManager)
         {
-
+            // Load scene bundle
             Assembly asm = Assembly.GetExecutingAssembly();
             using (Stream s = asm.GetManifestResourceStream(sceneResourceName))
             {
@@ -42,8 +42,6 @@ namespace HollowKnightTreasureHunt
                 Log.Debug("Loading bundle: " + sceneResourceName);
                 casinoBundle = AssetBundle.LoadFromMemory(buffer);
             }
-
-
             sceneNamePath = casinoBundle.GetAllScenePaths()[0];
 
             casinoInterior = satchelCore.GetCustomScene("CasinoScene", refTileMap, refSceneManager);
@@ -52,22 +50,6 @@ namespace HollowKnightTreasureHunt
             CustomSceneManagerSettings settings = new SceneUtils.CustomSceneManagerSettings(refSceneManager.GetComponent<SceneManager>());
             casinoInterior.Config(40, 25, settings);
 
-            // https://github.com/PrashantMohta/Satchel/blob/master/Utils/SceneUtils.cs#L144
-            /*casinoInterior.AddGateway(new GatewayParams
-            {
-                gateName = "left_01",
-                pos = new Vector2(11.5f, 7f),
-                size = new Vector2(0.1f, 0.2f),
-                fromScene = "CasinoScene",
-                toScene = "Town",
-                entryGate = "right_02",
-                respawnPoint = new Vector2(12.5f, 7f),
-                onlyOut = false,
-                vis = GameManager.SceneLoadVisualizations.Default
-            });*/
-
-            //casinoInterior.OnLoaded += TestOnload;
-            Log.Info("HIIIIII");
             UnityEngine.SceneManagement.SceneManager.activeSceneChanged += OnSceneChange;
         }
 
