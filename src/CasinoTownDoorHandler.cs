@@ -84,8 +84,8 @@ namespace HollowKnightTreasureHunt
                 }*/
                 gm.BeginSceneTransition(new GameManager.SceneLoadInfo
                 {
-                    SceneName = "Crossroads_01",
-                    EntryGateName = "top1",
+                    SceneName = "CasinoScene",
+                    EntryGateName = "left_01",
                     HeroLeaveDirection = GatePosition.bottom,
                     EntryDelay = 0.2f,
                     WaitForSceneTransitionCameraFade = true,

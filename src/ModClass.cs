@@ -31,6 +31,8 @@ namespace HollowKnightTreasureHunt
         public Satchel.CustomScene casinoInterior;
         public static AssetBundle casinoScene;
         public string sceneName;
+
+        public CasinoInterior Cassino;
         //public override List<ValueTuple<string, string>> GetPreloadNames()
         //{
         //    return new List<ValueTuple<string, string>>
@@ -50,10 +52,6 @@ namespace HollowKnightTreasureHunt
 
             Instance = this;
 
-            // UnityEngine.SceneManagement.SceneManager.activeSceneChanged += OnSceneChange;
-
-            StratosLogging.Log.Info("Initialized");
-
             ModHooks.HeroUpdateHook += OnHeroUpdate;
             On.HeroController.Awake += new On.HeroController.hook_Awake(this.OnHeroControllerAwake);
 
@@ -63,67 +61,15 @@ namespace HollowKnightTreasureHunt
             CardPrefab = preloads["Cliffs_01"]["Cornifer Card"];
             CustomArrowPrompt.Prepare(CardPrefab);
 
-
-
-            string name = "HollowKnightTreasureHunt.Resources.casinoscene";
-            Assembly asm = Assembly.GetExecutingAssembly();
-            using (Stream s = asm.GetManifestResourceStream(name))
-            {
-                byte[] buffer = new byte[s.Length];
-                s.Read(buffer, 0, buffer.Length);
-                s.Dispose();
-                Log("Loading bundle: " + name);
-                casinoScene = AssetBundle.LoadFromMemory(buffer);
-            }
-
-            StratosLogging.Log.Info("=====>" + casinoScene.GetAllScenePaths()[0]);
-
-            sceneName = casinoScene.GetAllScenePaths()[0];
-
-            casinoInterior = SatchelCore.GetCustomScene("CasinoScene", preloads["Room_mapper"]["TileMap"], preloads["Room_mapper"]["_SceneManager"]);
-
-
-
-            CustomSceneManagerSettings settings = new SceneUtils.CustomSceneManagerSettings(preloads["Room_mapper"]["_SceneManager"].GetComponent<SceneManager>());
-            casinoInterior.Config(5, 5, settings);
-
-            // https://github.com/PrashantMohta/Satchel/blob/master/Utils/SceneUtils.cs#L144
-            casinoInterior.AddGateway(new GatewayParams {
-                    gateName = "left_01",
-                    pos = new Vector2(0f, 0.2f),
-                    size = new Vector2(0.1f, 0.2f),
-                    fromScene = "CasinoScene",
-                    toScene = "Town",
-                    entryGate = "right_02",
-                    respawnPoint = new Vector2(1f, 0.2f),
-                    onlyOut = false,
-                    vis = GameManager.SceneLoadVisualizations.Default
-                });
-
-            casinoInterior.OnLoaded += TestOnload;
-
-
-
-            foreach (UnityEngine.SceneManagement.Scene scene in UnityEngine.SceneManagement.SceneManager.GetAllScenes())
-            {
-                StratosLogging.Log.Info("Scene" + scene.name);
-            }
-            // UnityEngine.SceneManagement.SceneManager.LoadScene();
+            // Create casino interio scene object
+            Cassino = new CasinoInterior(preloads["Room_mapper"]["TileMap"], preloads["Room_mapper"]["_SceneManager"]);
 
             StratosLogging.Log.Info("Loaded!!!");
-
         }
 
         private IEnumerator PlayExitAnimation()
         {
-            
-
             yield break;
-        }
-
-        private void TestOnload(object sender, SceneLoadedEventArgs e)
-        {
-            StratosLogging.Log.Warning("Loading complete");
         }
 
         // https://prashantmohta.github.io/ModdingDocs/preloads.html#how-to-preload-an-object
@@ -144,11 +90,10 @@ namespace HollowKnightTreasureHunt
             orig.Invoke(self);
 
             // Attach to hero for now
-            GameManager.instance.gameObject.AddComponent<CasinoShopHandler>();
+            var shop = GameManager.instance.gameObject.GetAddComponent<CasinoShopHandler>();
 
-            // GameManager.instance.gameObject.AddComponent<CasinoInteriorHandler>();
-
-            
+            // Attach the enter hero call back
+            On.GameManager.EnterHero += shop.EnterHero;
         }
 
         public void OnHeroUpdate()
@@ -158,14 +103,12 @@ namespace HollowKnightTreasureHunt
             // This WasPressed is defined in the subclass `OneAxisInputControl`
             if (Input.GetKeyDown(KeyCode.O))
             {
-                
-
                 Log("Key Pressed");
                 GameManager.instance.BeginSceneTransition(new GameManager.SceneLoadInfo
                 {
                     SceneName = "CasinoScene",
                     EntryGateName = "left_01",
-                    HeroLeaveDirection = GatePosition.bottom,
+                    HeroLeaveDirection = GatePosition.right,
                     EntryDelay = 0.2f,
                     WaitForSceneTransitionCameraFade = true,
                     PreventCameraFadeOut = false,
