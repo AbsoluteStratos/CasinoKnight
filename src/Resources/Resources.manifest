@@ -1,0 +1,10 @@
+ManifestFileVersion: 0
+CRC: 3800900540
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: casinoscene
+      Dependencies: {}
+    Info_1:
+      Name: stratos
+      Dependencies: {}
