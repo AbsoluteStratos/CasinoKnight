@@ -24,7 +24,6 @@ namespace HollowKnightTreasureHunt
 
         internal static HollowKnightTreasureHunt Instance;
 
-        public GameObject CardPrefab;
         public Dictionary<string, Dictionary<string, GameObject>> preloads;
         public static Satchel.Core SatchelCore = new Satchel.Core();
 
@@ -55,15 +54,18 @@ namespace HollowKnightTreasureHunt
             ModHooks.HeroUpdateHook += OnHeroUpdate;
             On.HeroController.Awake += new On.HeroController.hook_Awake(this.OnHeroControllerAwake);
 
+            // Prepare classes from preloaded objects
             // https://github.com/PrashantMohta/Smolknight/blob/6a6253ca3ea6549cc17bff47c33ade2ac28054e7/Smolknight.cs#L134
-            preloads = preloadedObjects;
-            StratosLogging.Log.Info(preloads.Keys.ToString());
-            CardPrefab = preloads["Cliffs_01"]["Cornifer Card"];
-            CustomArrowPrompt.Prepare(CardPrefab);
+            StratosLogging.Log.Info(preloadedObjects.Keys.ToString());
+            // Arrow prompt
+            Satchel.CustomArrowPrompt.Prepare(preloadedObjects["Cliffs_01"]["Cornifer Card"]);
+            // Slot machine lever
+            SlotLever.Prepare(preloadedObjects["Ruins1_23"]["Lift Call Lever"]);
 
             // Create casino interio scene object
-            Cassino = new CasinoInterior(preloads["Room_mapper"]["TileMap"], preloads["Room_mapper"]["_SceneManager"]);
+            Cassino = new CasinoInterior(preloadedObjects["Room_mapper"]["TileMap"], preloadedObjects["Room_mapper"]["_SceneManager"]);
 
+            
             StratosLogging.Log.Info("Loaded!!!");
         }
 
@@ -81,6 +83,7 @@ namespace HollowKnightTreasureHunt
                 ("Room_mapper","TileMap"),
                 ("Room_mapper","TileMap Render Data"),
                 ("Room_mapper","_SceneManager"),
+                ("Ruins1_23", "Lift Call Lever")
             };
         }
 
@@ -94,6 +97,11 @@ namespace HollowKnightTreasureHunt
 
         public void OnHeroUpdate()
         {
+
+            if (Input.GetKeyDown(KeyCode.J))
+            {
+                HeroController.instance.AddGeo(100);
+            }
             // casino.OnHeroUpdate();
             // Here we use the Player Action to detect the input
             // This WasPressed is defined in the subclass `OneAxisInputControl`

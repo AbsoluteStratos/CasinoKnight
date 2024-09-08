@@ -108,6 +108,11 @@ namespace HollowKnightTreasureHunt
                 tp.respawnMarker.respawnFacingRight = true;
                 tp.sceneLoadVisualization = GameManager.SceneLoadVisualizations.Default;
 
+
+                // TODO Delete after debugging
+                GameObject slotMachine = objab.transform.Find("slot").gameObject;
+                slotMachine.AddComponent<SlotHandler>();
+
                 Log.Warning("Gate Set up");
             }
             else

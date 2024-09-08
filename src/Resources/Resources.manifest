@@ -1,10 +1,7 @@
 ManifestFileVersion: 0
-CRC: 3800900540
+CRC: 3542598342
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
-      Name: casinoscene
-      Dependencies: {}
-    Info_1:
       Name: stratos
       Dependencies: {}
