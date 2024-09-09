@@ -16,6 +16,7 @@ using UObject = UnityEngine.Object;
 using System.Collections;
 using Satchel;
 using static Satchel.SceneUtils;
+using HutongGames.PlayMaker.Actions;
 
 namespace CasinoKnight
 {
@@ -77,8 +78,14 @@ namespace CasinoKnight
                 tp.sceneLoadVisualization = GameManager.SceneLoadVisualizations.Default;
 
                 Log.Warning("Gate Set up");
+
+                GameObject speaker = GameObject.Find("EnterSpeaker").gameObject;
+                speaker.AddComponent<AudioBehavior>();
+                Log.Info("Speaker Set Up");
             }
         }
+
+
 
         private void TestOnload(object sender, SceneLoadedEventArgs e)
         {
@@ -115,6 +122,20 @@ namespace CasinoKnight
             var x = GameManager.instance?.gameObject.GetComponent<LoadScene>();
             if (x == null) return;
             UObject.Destroy(x);
+        }
+    }
+
+    public class AudioBehavior : MonoBehaviour
+    {
+        private void Start()
+        {
+            StartCoroutine(PlayIntroAudio(GameObject.Find("EnterSpeaker").GetComponent<AudioSource>()));
+        }
+        IEnumerator PlayIntroAudio(AudioSource sfx)
+        {
+            sfx.Play();
+            yield return new WaitForSeconds(sfx.clip.length);
+            yield break;
         }
     }
 }

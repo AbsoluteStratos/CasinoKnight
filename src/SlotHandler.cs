@@ -85,6 +85,7 @@ namespace CasinoKnight
             (new Regex(@"444"), 100),
         };
         internal System.Random rand = new System.Random();
+        private AudioSource win_sfx, lose_sfx;
         private bool slotRunning = false; // If slot is currently running
         private void Awake()
         {
@@ -93,6 +94,11 @@ namespace CasinoKnight
             ReelObjs[0] = gameObject.transform.Find("machine/reel0").gameObject;
             ReelObjs[1] = gameObject.transform.Find("machine/reel1").gameObject;
             ReelObjs[2] = gameObject.transform.Find("machine/reel2").gameObject;
+
+            Log.Info("Stuff: " + gameObject.transform.Find("machine/win_sfx").gameObject.ToString());
+
+            win_sfx = gameObject.transform.Find("machine/win_sfx").gameObject.GetComponent<AudioSource>();
+            lose_sfx = gameObject.transform.Find("machine/lose_sfx").gameObject.GetComponent<AudioSource>();
 
             Log.Info("here1");
             var lever = SlotLever.GetNewLever("slot_lever", Play);
@@ -154,11 +160,15 @@ namespace CasinoKnight
             {
                 Log.Info("Win Payout: " + payout.ToString());
                 HeroController.instance.AddGeo(payout);
+                win_sfx.Play();
+                yield return new WaitForSeconds(win_sfx.clip.length);
             }
             else
             {
                 Log.Info("Loss Payout: " + payout.ToString());
                 HeroController.instance.TakeGeo(-payout);
+                lose_sfx.Play();
+                yield return new WaitForSeconds(lose_sfx.clip.length);
             }
             slotRunning = false;
             yield break;

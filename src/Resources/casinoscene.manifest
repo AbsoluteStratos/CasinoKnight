@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 1835490014
+CRC: 13249310
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: b596dccb52fa97038bf3df17cc8161f5
+    Hash: 6c4a4aaf398b9505bc23bfb94ee91ca9
   TypeTreeHash:
     serializedVersion: 2
-    Hash: ff9d086a731ccc5bb414a3a5ba759b7a
+    Hash: 5373559314830e9bcecad062fb5dd3c6
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -29,6 +29,10 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 68
   Script: {instanceID: 0}
+- Class: 82
+  Script: {instanceID: 0}
+- Class: 83
+  Script: {instanceID: 0}
 - Class: 104
   Script: {instanceID: 0}
 - Class: 114
@@ -43,5 +47,5 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/Mod/Casino/CasinoScene.unity
+- Assets/Mod/CasinoScene.unity
 Dependencies: []
