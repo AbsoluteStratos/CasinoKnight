@@ -4,18 +4,18 @@
     <!-- <HollowKnightRefs>E:/GOG/Hollow Knight 1.5 Modded/Hollow Knight_Data/Managed/</HollowKnightRefs> -->
 	<HollowKnightRefs>C:\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed</HollowKnightRefs>
     <!-- Change this to the path where you want the ready-to-upload exports to be -->
-	<ExportDir>C:\Users\$(USERNAME)\Documents\Hollow Knight Mods\HollowKnightTreasureHunt\bin</ExportDir>
+	<ExportDir>C:\Users\$(USERNAME)\Documents\Hollow Knight Mods\CasinoKnight\bin</ExportDir>
     <!-- Uncomment this to generate a documentation file to be included with the mod -->
     <!--<DocumentationFile>$(OutputPath)/$(AssemblyTitle).xml</DocumentationFile>-->
   </PropertyGroup>
   <PropertyGroup>
-    <RootNamespace>HollowKnightTreasureHunt</RootNamespace>
-    <AssemblyName>HollowKnightTreasureHunt</AssemblyName>
+    <RootNamespace>CasinoKnight</RootNamespace>
+    <AssemblyName>CasinoKnight</AssemblyName>
     <TargetFramework>net472</TargetFramework>
-    <AssemblyTitle>HollowKnightTreasureHunt</AssemblyTitle>
-    <Product>HollowKnightTreasureHunt</Product>
-    <Description>A Hollow Knight Mod</Description>
-    <Copyright>Copyright ©  2024</Copyright>
+    <AssemblyTitle>CasinoKnight</AssemblyTitle>
+    <Product>CasinoKnight</Product>
+    <Description>Let go gambling!</Description>
+    <Copyright>Copyright ©2024</Copyright>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
     <OutputPath>$(ExportDir)\$(Configuration)\</OutputPath>

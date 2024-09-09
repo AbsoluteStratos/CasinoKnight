@@ -15,7 +15,7 @@ using UnityEngine.SceneManagement;
 using static GameManager;
 using Satchel;
 
-namespace HollowKnightTreasureHunt
+namespace CasinoKnight
 {
     public class CasinoShopHandler : MonoBehaviour
     {
@@ -64,7 +64,7 @@ namespace HollowKnightTreasureHunt
             // Dirtmouth scene name
             if (to.name == "Town")
             {
-                string bundle_name = "HollowKnightTreasureHunt.Resources.stratos";
+                string bundle_name = "CasinoKnight.Resources.stratos";
 
                 if (cassinoBundle == null)
                 {
@@ -97,7 +97,7 @@ namespace HollowKnightTreasureHunt
 
                 // Add a transition hook door collider
                 GameObject gate = objab.transform.Find("Casino/door_casino").gameObject;
-                gate.AddComponent<CasinoTownDoorHanlder>();
+                gate.AddComponent<CasinoTownDoorHandler>();
                 var tp = gate.AddComponent<TransitionPoint>();
                 tp.isADoor = true;
                 tp.alwaysEnterLeft = false;

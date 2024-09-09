@@ -11,7 +11,7 @@ using HutongGames.PlayMaker;
 using System.Collections;
 using System.Text.RegularExpressions;
 
-namespace HollowKnightTreasureHunt
+namespace CasinoKnight
 {
     public class SlotLever
     {
@@ -122,7 +122,6 @@ namespace HollowKnightTreasureHunt
                 values[i] = ReelMaps[i][reel_index];
 
                 var animator = ReelObjs[i].GetComponent<Animator>();
-                ReelObjs[i].GetComponent<Animator>().GetInteger("VALUE");
                 animator.SetInteger("PREV", animator.GetInteger("VALUE"));
                 animator.SetInteger("VALUE", values[i]);
                 animator.Play("Start");

@@ -17,7 +17,7 @@ using System.Collections;
 using Satchel;
 using static Satchel.SceneUtils;
 
-namespace HollowKnightTreasureHunt
+namespace CasinoKnight
 {
     public class CasinoInterior
     {
@@ -27,7 +27,7 @@ namespace HollowKnightTreasureHunt
         private CustomScene casinoInterior;
 
         private static Satchel.Core satchelCore = new Satchel.Core();
-        private static string sceneResourceName = "HollowKnightTreasureHunt.Resources.casinoscene";
+        private static string sceneResourceName = "CasinoKnight.Resources.casinoscene";
 
 
         public CasinoInterior(GameObject refTileMap, GameObject refSceneManager)
@@ -85,7 +85,7 @@ namespace HollowKnightTreasureHunt
             StratosLogging.Log.Warning("Loading complete");
         }
 
-        private AssetBundle LoadAssetBundle(string name = "HollowKnightTreasureHunt.Resources.casinoscene")
+        private AssetBundle LoadAssetBundle(string name = "CasinoKnight.Resources.casinoscene")
         {
             Assembly asm = Assembly.GetExecutingAssembly();
             using (Stream s = asm.GetManifestResourceStream(name))

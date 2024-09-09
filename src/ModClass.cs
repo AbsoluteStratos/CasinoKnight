@@ -16,13 +16,13 @@ using GlobalEnums;
 using static Satchel.SceneUtils;
 using static Mono.Security.X509.X520;
 
-namespace HollowKnightTreasureHunt
+namespace CasinoKnight
 {
-    public class HollowKnightTreasureHunt : Mod, ICustomMenuMod
+    public class CasinoKnight : Mod, ICustomMenuMod
     {
         private Menu MenuRef;
 
-        internal static HollowKnightTreasureHunt Instance;
+        internal static CasinoKnight Instance;
 
         public Dictionary<string, Dictionary<string, GameObject>> preloads;
         public static Satchel.Core SatchelCore = new Satchel.Core();
@@ -40,7 +40,7 @@ namespace HollowKnightTreasureHunt
         //    };
         //}
 
-        //public HollowKnightTreasureHunt() : base("HollowKnightTreasureHunt")
+        //public CasinoKnight() : base("CasinoKnight")
         //{
         //    Instance = this;
         //}

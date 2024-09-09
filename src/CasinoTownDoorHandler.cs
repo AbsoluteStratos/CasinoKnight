@@ -11,9 +11,9 @@ using Satchel;
 using System.Collections;
 using System.Runtime.CompilerServices;
 
-namespace HollowKnightTreasureHunt
+namespace CasinoKnight
 {
-    public class CasinoTownDoorHanlder : MonoBehaviour
+    public class CasinoTownDoorHandler : MonoBehaviour
     {
         private GameManager gm;
         private tk2dSpriteAnimator heroAnim;

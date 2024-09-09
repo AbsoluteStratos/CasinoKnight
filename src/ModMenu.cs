@@ -11,7 +11,7 @@ using MenuButton = Satchel.BetterMenus.MenuButton;
 using InControl;
 using StratosLogging;
 
-namespace HollowKnightTreasureHunt
+namespace CasinoKnight
 {
     public static class ModMenu
     {

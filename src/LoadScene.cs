@@ -8,7 +8,7 @@ using UnityEngine;
 using StratosLogging;
 using Satchel;
 
-namespace HollowKnightTreasureHunt
+namespace CasinoKnight
 {
     public class LoadScene : MonoBehaviour
     {
