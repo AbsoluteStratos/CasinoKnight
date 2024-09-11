@@ -61,9 +61,8 @@ namespace CasinoKnight
 
     public class SlotHandler : MonoBehaviour
     {
-        public int BET_AMOUNT = 10;
-        public static GameObject LeverPrefab;
-        public GameObject[] ReelObjs = new GameObject[3];
+        
+        internal GameObject[] ReelObjs = new GameObject[3];
         internal Dictionary<int, int[]> ReelMaps = new Dictionary<int, int[]>()
         {
             {0, new int[] {0,0,0,1,1,1,2,2,2,3,4}},
@@ -85,7 +84,11 @@ namespace CasinoKnight
             (new Regex(@"444"), 100),
         };
         internal System.Random rand = new System.Random();
+
+        internal GameObject arrowPrompt;
+
         private AudioSource win_sfx, lose_sfx;
+        private int bet = 10;
         private bool slotRunning = false; // If slot is currently running
         private void Awake()
         {
@@ -100,12 +103,21 @@ namespace CasinoKnight
             win_sfx = gameObject.transform.Find("machine/win_sfx").gameObject.GetComponent<AudioSource>();
             lose_sfx = gameObject.transform.Find("machine/lose_sfx").gameObject.GetComponent<AudioSource>();
 
-            Log.Info("here1");
+            // Needs preloads["Ruins1_23"]["Lift Call Lever"]; on mod init
             var lever = SlotLever.GetNewLever("slot_lever", Play);
             lever.SetActive(true);
+            lever.SetScale(0.7f, 0.7f);
             lever.transform.parent = gameObject.transform;
-            lever.transform.localPosition = new Vector3(0f, -1.0f, 0f);
+            lever.transform.localPosition = new Vector3(0f, -1.25f, 0f);
             Log.Info("Lever pos" + lever.transform.position.ToString() + gameObject.transform.position.ToString());
+
+            // Needs preloads["Cliffs_01"]["Cornifer Card"]; on mod init
+            // Assumes CustomArrowPrompt.Prepare(CardPrefab); has been called
+            // https://github.com/PrashantMohta/Satchel/blob/2e922c2939ae35af0a256b5edd1792db0dbf0c92/Custom/CustomArrowPrompt.cs
+            arrowPrompt = gameObject.transform.Find("prompt_marker").gameObject;
+            CustomArrowPrompt.GetAddCustomArrowPrompt(arrowPrompt, String.Format("Bet {0}", bet), null);
+            arrowPrompt.SetActive(true);
+            Log.Info("arrow prompt updated");
         }
 
         public void Play(FsmState state)
@@ -114,7 +126,7 @@ namespace CasinoKnight
             if (slotRunning)
             {
                 return;
-            } else if (numGeo < BET_AMOUNT)
+            } else if (numGeo < bet)
             {
                 Log.Error("Not enough money!");
                 return;
@@ -133,7 +145,7 @@ namespace CasinoKnight
                 animator.Play("Start");
             }
 
-            int payout = -BET_AMOUNT;
+            int payout = -bet;
             string value_pattern = String.Format("{0}{1}{2}", values[0], values[1], values[2]);
             Log.Info("Slot pattern: " + value_pattern);
             foreach ((Regex, int) item in ReelPayout)
@@ -141,7 +153,7 @@ namespace CasinoKnight
                 if (item.Item1.IsMatch(value_pattern))
                 {
                     Log.Info("Slot win match found: " + value_pattern + " -> " + item.Item2.ToString());
-                    payout = item.Item2 * BET_AMOUNT;
+                    payout = item.Item2 * bet;
                 }
             }
             
@@ -152,28 +164,63 @@ namespace CasinoKnight
         IEnumerator SlotPayoutCoroutine(int payout)
         {
             //yield on a new YieldInstruction that waits for 0.5 for animation to finish.
-            yield return new WaitForSeconds(0.75f);
+            yield return new WaitForSeconds(1.25f);
 
+            slotRunning = false;
             // For geo utils see the following reference:
             // https://github.com/dpinela/Transcendence/blob/aa075856eabeffc5ba0c4e3c09aab5309229e905/Transcendence/Charms/MillibellesBlessing.cs#L26
             if (payout > 0)
             {
                 Log.Info("Win Payout: " + payout.ToString());
                 HeroController.instance.AddGeo(payout);
-                win_sfx.Play();
-                yield return new WaitForSeconds(win_sfx.clip.length);
+                if (CasinoKnight.GS.EnableSFX)
+                {
+                    win_sfx.Play();
+                    yield return new WaitForSeconds(win_sfx.clip.length);
+                }
             }
             else
             {
                 Log.Info("Loss Payout: " + payout.ToString());
                 HeroController.instance.TakeGeo(-payout);
-                lose_sfx.Play();
-                yield return new WaitForSeconds(lose_sfx.clip.length);
+                if (CasinoKnight.GS.EnableSFX)
+                {
+                    lose_sfx.Play();
+                    yield return new WaitForSeconds(lose_sfx.clip.length);
+                }
             }
-            slotRunning = false;
+            
             yield break;
         }
 
+        void OnTriggerStay2D(Collider2D other)
+        {
+            if (other.name == "Knight" && Mathf.Abs(other.attachedRigidbody.velocity.x) < 0.1)
+            {
+                arrowPrompt.GetComponent<CustomArrowPromptBehaviour>().Show();
+            }
+        }
 
+        void OnTriggerExit2D(Collider2D other)
+        {
+            if (other.name == "Knight")
+            {
+                arrowPrompt.GetComponent<CustomArrowPromptBehaviour>().Hide();
+            }
+        }
+
+        public int BetAmount
+        {
+            get
+            {
+                return this.bet;
+            }
+            set
+            {
+                this.bet = value;
+                CustomArrowPromptBehaviour prompt = this.arrowPrompt.GetComponent<CustomArrowPromptBehaviour>();
+                prompt.PromptText = String.Format("Bet {0}", value);
+            }
+        }
     }
 }

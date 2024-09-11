@@ -18,10 +18,13 @@ using static Mono.Security.X509.X520;
 
 namespace CasinoKnight
 {
-    public class CasinoKnight : Mod, ICustomMenuMod
+    public class CasinoKnight : Mod, IGlobalSettings<GlobalSettings>, ICustomMenuMod, ITogglableMod
     {
-        private Menu MenuRef;
 
+        new public string GetName() => "Casino Knight";
+        public override string GetVersion() => "0.1.0";
+
+        internal static GlobalSettings GS = new GlobalSettings();
         internal static CasinoKnight Instance;
 
         public Dictionary<string, Dictionary<string, GameObject>> preloads;
@@ -32,6 +35,9 @@ namespace CasinoKnight
         public string sceneName;
 
         public CasinoInterior Cassino;
+
+        private Menu MenuRef;
+
         //public override List<ValueTuple<string, string>> GetPreloadNames()
         //{
         //    return new List<ValueTuple<string, string>>
@@ -56,7 +62,6 @@ namespace CasinoKnight
 
             // Prepare classes from preloaded objects
             // https://github.com/PrashantMohta/Smolknight/blob/6a6253ca3ea6549cc17bff47c33ade2ac28054e7/Smolknight.cs#L134
-            StratosLogging.Log.Info(preloadedObjects.Keys.ToString());
             // Arrow prompt
             Satchel.CustomArrowPrompt.Prepare(preloadedObjects["Cliffs_01"]["Cornifer Card"]);
             // Slot machine lever
@@ -65,7 +70,7 @@ namespace CasinoKnight
             // Create casino interio scene object
             Cassino = new CasinoInterior(preloadedObjects["Room_mapper"]["TileMap"], preloadedObjects["Room_mapper"]["_SceneManager"]);
 
-            
+
             StratosLogging.Log.Info("Loaded!!!");
         }
 
@@ -135,6 +140,16 @@ namespace CasinoKnight
             Debug.Log("Finished Coroutine at timestamp : " + Time.time);
         }
 
+        void IGlobalSettings<GlobalSettings>.OnLoadGlobal(GlobalSettings s)
+        {
+            GS = s;
+        }
+
+        GlobalSettings IGlobalSettings<GlobalSettings>.OnSaveGlobal()
+        {
+            return GS;
+        }
+
         /// <summary>
         /// Get mode menu, required for Stachel better menu interface
         /// </summary>
@@ -143,11 +158,18 @@ namespace CasinoKnight
         /// <returns></returns>
         public MenuScreen GetMenuScreen(MenuScreen modListMenu, ModToggleDelegates? modtoggledelegates)
         {
-            return ModMenu.GetMenuScreen(MenuRef, modListMenu, modtoggledelegates);
+            if (MenuRef == null)
+            {
+                MenuRef = ModMenu.PrepareMenu((ModToggleDelegates)modtoggledelegates);
+            }
+            return MenuRef.GetMenuScreen(modListMenu);
         }
 
-        //a property requuired by the ICustomMenuMod interface to be implemented
-        //since our mod is not IToggleable, we can leave it as is (leave it as null)
-        public bool ToggleButtonInsideMenu { get; }
+        public bool ToggleButtonInsideMenu => true;
+
+        public void Unload()
+        {
+            Log("Unloaded");
+        }
     }
 }

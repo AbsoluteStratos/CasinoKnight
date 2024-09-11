@@ -86,7 +86,6 @@ namespace CasinoKnight
         }
 
 
-
         private void TestOnload(object sender, SceneLoadedEventArgs e)
         {
             StratosLogging.Log.Warning("Loading complete");
@@ -129,7 +128,10 @@ namespace CasinoKnight
     {
         private void Start()
         {
-            StartCoroutine(PlayIntroAudio(GameObject.Find("EnterSpeaker").GetComponent<AudioSource>()));
+            if (CasinoKnight.GS.EnableSFX)
+            {
+                StartCoroutine(PlayIntroAudio(GameObject.Find("EnterSpeaker").GetComponent<AudioSource>()));
+            }
         }
         IEnumerator PlayIntroAudio(AudioSource sfx)
         {
