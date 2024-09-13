@@ -76,10 +76,10 @@ namespace CasinoKnight
             (new Regex(@"44."), 2),
             (new Regex(@"4.4"), 2),
             (new Regex(@".44"), 2),
-            (new Regex(@"000"), 4),
-            (new Regex(@"111"), 8),
-            (new Regex(@"222"), 16),
-            (new Regex(@"333"), 32),
+            (new Regex(@"000"), 2),
+            (new Regex(@"111"), 4),
+            (new Regex(@"222"), 8),
+            (new Regex(@"333"), 16),
             (new Regex(@"444"), 100),
         };
         internal System.Random rand = new System.Random(Guid.NewGuid().GetHashCode());

@@ -94,14 +94,13 @@ namespace CasinoKnight
         public void OnHeroUpdate()
         {
 
-            if (Input.GetKeyDown(KeyCode.J))
+            /*if (Input.GetKeyDown(KeyCode.J))
             {
                 HeroController.instance.AddGeo(100);
-            }
-            // casino.OnHeroUpdate();
+            }*/
             // Here we use the Player Action to detect the input
             // This WasPressed is defined in the subclass `OneAxisInputControl`
-            if (Input.GetKeyDown(KeyCode.O))
+            /*if (Input.GetKeyDown(KeyCode.O))
             {
                 // Quick jump to casino for testing, remove
                 GameManager.instance.BeginSceneTransition(new GameManager.SceneLoadInfo
@@ -116,7 +115,7 @@ namespace CasinoKnight
                     AlwaysUnloadUnusedAssets = false,
                     forceWaitFetch = false
                 });
-            }
+            }*/
         }
 
         void IGlobalSettings<GlobalSettings>.OnLoadGlobal(GlobalSettings s)
