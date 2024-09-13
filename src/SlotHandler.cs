@@ -64,9 +64,9 @@ namespace CasinoKnight
         internal GameObject[] ReelObjs = new GameObject[3];
         internal Dictionary<int, int[]> ReelMaps = new Dictionary<int, int[]>()
         {
-            {0, new int[] {0,0,0,1,1,1,2,2,2,3,4}},
-            {1, new int[] {0,0,0,1,1,2,2,3,3,4}},
-            {2, new int[] {0,0,0,1,1,2,2,3,4}},
+            {0, new int[] {0,0,0,0,1,1,1,2,2,3,3,4}},
+            {1, new int[] {0,0,0,1,1,2,2,2,2,3,3,3,4}},
+            {2, new int[] {0,0,0,1,1,2,2,3,3,3,4}},
         };
         internal List<(Regex, int)> ReelPayout = new List<(Regex, int)>()
         {
@@ -91,13 +91,10 @@ namespace CasinoKnight
         private bool slotRunning = false; // If slot is currently running
         private void Awake()
         {
-            Log.Info("Test");
             // Initialize
             ReelObjs[0] = gameObject.transform.Find("machine/reel0").gameObject;
             ReelObjs[1] = gameObject.transform.Find("machine/reel1").gameObject;
             ReelObjs[2] = gameObject.transform.Find("machine/reel2").gameObject;
-
-            Log.Info("Stuff: " + gameObject.transform.Find("machine/win_sfx").gameObject.ToString());
 
             win_sfx = gameObject.transform.Find("machine/win_sfx").gameObject.GetComponent<AudioSource>();
             lose_sfx = gameObject.transform.Find("machine/lose_sfx").gameObject.GetComponent<AudioSource>();

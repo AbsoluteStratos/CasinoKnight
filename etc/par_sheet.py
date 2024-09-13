@@ -25,9 +25,9 @@ def calculate_odds(pay_sheet: dict[str, int], combo_table: list[str]) -> float:
     return float(wins) / len(combo_table)
 
 if __name__ == "__main__":
-    reel1 = ["1", "1", "1", "2", "2", "2", "3", "3", "3","4", "5"]
-    reel2 = ["1", "1", "1", "2", "2", "3","3", "4", "4", "5"]
-    reel3 = ["1", "1", "1", "2", "2", "3", "3", "4", "5"]
+    reel1 = ["1", "1", "1", "1", "2", "2", "2", "3", "3", "4", "4", "5"]
+    reel2 = ["1", "1", "1", "2", "2", "3", "3", "3", "3", "4",  "4", "4", "5"]
+    reel3 = ["1", "1", "1", "2", "2", "3", "3", "4", "4", "4", "5"]
 
     pay_sheet = {
         "5..": 1,
@@ -36,12 +36,15 @@ if __name__ == "__main__":
         "55.": 2,
         "5.5": 2,
         ".55": 2,
-        "111": 4,
-        "222": 8,
-        "333": 16,
-        "444": 32,
+        "111": 2,
+        "222": 4,
+        "333": 8,
+        "444": 16,
         "555": 100,
     }
+    # Add one to represent bet amount return
+    for key, value in pay_sheet.items():
+        pay_sheet[key] = value + 1
     
     combo_table = build_combo_table([reel1, reel2, reel3])
 

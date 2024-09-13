@@ -8,7 +8,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using StratosLogging;
 using GlobalEnums;
 using UnityEngine.SceneManagement;
 using Modding;
@@ -46,14 +45,23 @@ namespace CasinoKnight
             }
             sceneNamePath = casinoBundle.GetAllScenePaths()[0];
 
+            // Use Satchel to create a custome scene
+            // https://github.com/PrashantMohta/Satchel/blob/master/Core.cs#L177
             casinoInterior = satchelCore.GetCustomScene("CasinoScene", refTileMap, refSceneManager);
-            casinoInterior.OnLoaded += TestOnload;
-            
+            casinoInterior.OnLoaded += SceneOnload;
+
+            // Can edit properties in the settings object, will by default use the value in the reference scene manager
+            // which is the mappers store room in this case
+            // https://github.com/PrashantMohta/Satchel/blob/master/Utils/SceneUtils.cs#L36
             CustomSceneManagerSettings settings = new SceneUtils.CustomSceneManagerSettings(refSceneManager.GetComponent<SceneManager>());
+            settings.saturation = 1.2f;
+            settings.heroLightColor = new Color(1.0f, 0.28f, 0.3f, 0.05f);
             casinoInterior.Config(40, 25, settings);
+            // Satchel will handle set up of the scene manager, but we need our own call back for modifying objects
             // Add call back to load the scene on change
             UnityEngine.SceneManagement.SceneManager.activeSceneChanged += OnSceneChange;
 
+            // Store preloaded fabs
             heroLightPrefab = heroLight;
             flysPrefab = flys;
         }
@@ -68,9 +76,9 @@ namespace CasinoKnight
                 // Manually replicating because I already have game objects in the scene
                 // https://github.com/PrashantMohta/Satchel/blob/master/Utils/SceneUtils.cs#L144
                 GameObject gate = GameObject.Find("left_01").gameObject;
-                Log.Info(gate.transform.position.ToString());
                 var tp = gate.AddComponent<TransitionPoint>();
 
+                // See Casino Exterior for linked Gate
                 tp.isADoor = false;
                 tp.SetTargetScene("Town");
                 tp.entryPoint = "door_casino";
@@ -110,23 +118,9 @@ namespace CasinoKnight
             }
         }
 
-
-        private void TestOnload(object sender, SceneLoadedEventArgs e)
+        private void SceneOnload(object sender, SceneLoadedEventArgs e)
         {
-            StratosLogging.Log.Warning("Loading complete");
-        }
-
-        private AssetBundle LoadAssetBundle(string name = "CasinoKnight.Resources.casinoscene")
-        {
-            Assembly asm = Assembly.GetExecutingAssembly();
-            using (Stream s = asm.GetManifestResourceStream(name))
-            {
-                byte[] buffer = new byte[s.Length];
-                s.Read(buffer, 0, buffer.Length);
-                s.Dispose();
-                Log.Info("Loading bundle: " + name);
-                return AssetBundle.LoadFromMemory(buffer);
-            }
+            Log.Info("Casino Scene loading complete");
         }
 
         // https://radiance.synthagen.net/apidocs/_images/Assets.html?highlight=getexecutingassembly#using-our-loaded-stuff
@@ -144,23 +138,6 @@ namespace CasinoKnight
             }
         }
 
-        private void AfterSaveGameLoad(SaveGameData data) => AddComponent();
-
-        private void AddComponent()
-        {
-            GameManager.instance.gameObject.AddComponent<LoadScene>();
-        }
-
-        public void Unload()
-        {
-            ModHooks.AfterSavegameLoadHook -= AfterSaveGameLoad;
-            ModHooks.NewGameHook -= AddComponent;
-
-            // ReSharper disable once Unity.NoNullPropogation
-            var x = GameManager.instance?.gameObject.GetComponent<LoadScene>();
-            if (x == null) return;
-            UObject.Destroy(x);
-        }
     }
 
     public class AudioBehavior : MonoBehaviour

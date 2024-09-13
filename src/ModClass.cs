@@ -14,7 +14,6 @@ using UnityEngine.SceneManagement;
 using HutongGames.PlayMaker.Actions;
 using GlobalEnums;
 using static Satchel.SceneUtils;
-using static Mono.Security.X509.X520;
 
 namespace CasinoKnight
 {
@@ -33,7 +32,8 @@ namespace CasinoKnight
         public static AssetBundle casinoScene;
         public string sceneName;
 
-        private CasinoInterior casInter;
+        private CasinoInterior casinoInterior;
+        private CasinoExterior casinoExterior;
         private Menu MenuRef;
 
         //public override List<ValueTuple<string, string>> GetPreloadNames()
@@ -51,12 +51,11 @@ namespace CasinoKnight
 
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
         {
-            StratosLogging.Log.Info("Initializing");
+            StratosLogging.Log.Info("Casino Knight initializing");
 
             Instance = this;
 
             ModHooks.HeroUpdateHook += OnHeroUpdate;
-            On.HeroController.Awake += new On.HeroController.hook_Awake(this.OnHeroControllerAwake);
 
             // Prepare classes from preloaded objects
             // https://github.com/PrashantMohta/Smolknight/blob/6a6253ca3ea6549cc17bff47c33ade2ac28054e7/Smolknight.cs#L134
@@ -64,20 +63,17 @@ namespace CasinoKnight
             Satchel.CustomArrowPrompt.Prepare(preloadedObjects["Cliffs_01"]["Cornifer Card"]);
             // Slot machine lever
             SlotLever.Prepare(preloadedObjects["Ruins1_23"]["Lift Call Lever"]);
-            // Create casino interio scene object
-            casInter = new CasinoInterior(
+            // Create casino interior scene object
+            casinoInterior = new CasinoInterior(
                 preloadedObjects["Room_mapper"]["TileMap"],
                 preloadedObjects["Room_mapper"]["_SceneManager"],
                 preloadedObjects["Town"]["_Scenery/point_light/HeroLight 3"],
                 preloadedObjects["Town"]["_Scenery/lamp_flys/flys"]
            );
+            // Create casino interior scene object
+            casinoExterior = new CasinoExterior();
 
-            StratosLogging.Log.Info("Loaded!!!");
-        }
-
-        private IEnumerator PlayExitAnimation()
-        {
-            yield break;
+            StratosLogging.Log.Info("Casino Knight loaded!");
         }
 
         // https://prashantmohta.github.io/ModdingDocs/preloads.html#how-to-preload-an-object
@@ -93,14 +89,6 @@ namespace CasinoKnight
                 ("Town", "_Scenery/point_light/HeroLight 3"),
                 ("Ruins1_23", "Lift Call Lever")
             };
-        }
-
-
-        private void OnHeroControllerAwake(On.HeroController.orig_Awake orig, HeroController self)
-        {
-            orig.Invoke(self);
-            // Attach the casino manager to the GameManager
-            var shop = GameManager.instance.gameObject.GetAddComponent<CasinoShopHandler>();
         }
 
         public void OnHeroUpdate()
@@ -129,18 +117,6 @@ namespace CasinoKnight
                     forceWaitFetch = false
                 });
             }
-        }
-
-        IEnumerator ExampleCoroutine()
-        {
-            //Print the time of when the function is first called.
-            Debug.Log("Started Coroutine at timestamp : " + Time.time);
-
-            //yield on a new YieldInstruction that waits for 5 seconds.
-            yield return new WaitForSeconds(5);
-
-            //After we have waited 5 seconds print the time again.
-            Debug.Log("Finished Coroutine at timestamp : " + Time.time);
         }
 
         void IGlobalSettings<GlobalSettings>.OnLoadGlobal(GlobalSettings s)
