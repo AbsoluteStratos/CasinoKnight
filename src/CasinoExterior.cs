@@ -128,7 +128,7 @@ namespace CasinoKnight
 
                 Log.Warning("Casino town asset set up");
             }
-            else
+            else if (cassinoBundle != null)
             {
                 Log.Info("Unloading asset");
                 cassinoBundle.Unload(true);

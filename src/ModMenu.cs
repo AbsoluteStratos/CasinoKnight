@@ -20,18 +20,18 @@ namespace CasinoKnight
         {
             //Create a new MenuRef if it's not null
             Menu MenuRef = new Menu(
-                        name: "Casino Knight", //the title of the menu screen, it will appear on the top center of the screen 
-                        elements: new Element[]
-                        {
-                             new TextPanel("Options",800f),
+                name: "Casino Knight", //the title of the menu screen, it will appear on the top center of the screen 
+                elements: new Element[]
+                {
+                        new TextPanel("Options",800f),
 
-                             new HorizontalOption(
-                                "Sound Effects", "Toggle gamblecore sounds",
-                                new string[]{"On","Off"},
-                                (setting) => { CasinoKnight.GS.EnableSFX = (setting == 0); },
-                                () => { if( CasinoKnight.GS.EnableSFX) { return 0; } else { return 1;} }
-                            )
-                        }
+                        new HorizontalOption(
+                        "Sound Effects", "Toggle gamblecore sounds",
+                        new string[]{"On","Off"},
+                        (setting) => { CasinoKnight.GS.EnableSFX = (setting == 0); },
+                        () => { if( CasinoKnight.GS.EnableSFX) { return 0; } else { return 1;} }
+                    )
+                }
             );
 
             //uses the GetMenuScreen function to return a menuscreen that MAPI can use. 

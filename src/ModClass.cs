@@ -149,6 +149,9 @@ namespace CasinoKnight
         public void Unload()
         {
             Log("Unloaded");
+            casinoInterior = null;
+            casinoExterior = null;
+            
         }
     }
 }
