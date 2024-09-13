@@ -30,12 +30,10 @@ namespace CasinoKnight
         public Dictionary<string, Dictionary<string, GameObject>> preloads;
         public static Satchel.Core SatchelCore = new Satchel.Core();
 
-        public Satchel.CustomScene casinoInterior;
         public static AssetBundle casinoScene;
         public string sceneName;
 
-        public CasinoInterior Cassino;
-
+        private CasinoInterior casInter;
         private Menu MenuRef;
 
         //public override List<ValueTuple<string, string>> GetPreloadNames()
@@ -66,10 +64,13 @@ namespace CasinoKnight
             Satchel.CustomArrowPrompt.Prepare(preloadedObjects["Cliffs_01"]["Cornifer Card"]);
             // Slot machine lever
             SlotLever.Prepare(preloadedObjects["Ruins1_23"]["Lift Call Lever"]);
-
             // Create casino interio scene object
-            Cassino = new CasinoInterior(preloadedObjects["Room_mapper"]["TileMap"], preloadedObjects["Room_mapper"]["_SceneManager"]);
-
+            casInter = new CasinoInterior(
+                preloadedObjects["Room_mapper"]["TileMap"],
+                preloadedObjects["Room_mapper"]["_SceneManager"],
+                preloadedObjects["Town"]["_Scenery/point_light/HeroLight 3"],
+                preloadedObjects["Town"]["_Scenery/lamp_flys/flys"]
+           );
 
             StratosLogging.Log.Info("Loaded!!!");
         }
@@ -88,6 +89,8 @@ namespace CasinoKnight
                 ("Room_mapper","TileMap"),
                 ("Room_mapper","TileMap Render Data"),
                 ("Room_mapper","_SceneManager"),
+                ("Town","_Scenery/lamp_flys/flys"),
+                ("Town", "_Scenery/point_light/HeroLight 3"),
                 ("Ruins1_23", "Lift Call Lever")
             };
         }

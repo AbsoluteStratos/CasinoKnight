@@ -58,7 +58,6 @@ namespace CasinoKnight
         }
     }
 
-
     public class SlotHandler : MonoBehaviour
     {
         
@@ -83,7 +82,7 @@ namespace CasinoKnight
             (new Regex(@"333"), 32),
             (new Regex(@"444"), 100),
         };
-        internal System.Random rand = new System.Random();
+        internal System.Random rand = new System.Random(Guid.NewGuid().GetHashCode());
 
         internal GameObject arrowPrompt;
 

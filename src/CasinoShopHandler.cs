@@ -64,7 +64,7 @@ namespace CasinoKnight
             // Dirtmouth scene name
             if (to.name == "Town")
             {
-                string bundle_name = "CasinoKnight.Resources.stratos";
+                string bundle_name = "CasinoKnight.Resources.casinoknighttown";
 
                 if (cassinoBundle == null)
                 {
@@ -90,30 +90,53 @@ namespace CasinoKnight
                 }
 
                 // Note the path is based on where you saved the prefab
-                GameObject objab = Instantiate(cassinoBundle.LoadAsset<GameObject>("Assets/Mod/stratos.prefab"));
+                GameObject objab = Instantiate(cassinoBundle.LoadAsset<GameObject>("Assets/Mod/casinoknighttown.prefab"));
                 objab.transform.position = UnityEngine.Vector3.zero;
                 objab.SetActive(true);
                 ResetPrefabMaterials(objab);
 
                 // Add a transition hook door collider
-                GameObject gate = objab.transform.Find("Casino/door_casino").gameObject;
+                GameObject gate = objab.transform.Find("casino/door_casino").gameObject;
                 gate.AddComponent<CasinoTownDoorHandler>();
                 var tp = gate.AddComponent<TransitionPoint>();
                 tp.isADoor = true;
                 tp.alwaysEnterLeft = false;
                 tp.alwaysEnterRight = false;
 
-                GameObject rm = objab.transform.Find("Casino/door_casino/Hazard Respawn Marker").gameObject;
+                GameObject rm = objab.transform.Find("casino/door_casino/Hazard Respawn Marker").gameObject;
                 tp.respawnMarker = rm.AddComponent<HazardRespawnMarker>();
                 tp.respawnMarker.respawnFacingRight = true;
                 tp.sceneLoadVisualization = GameManager.SceneLoadVisualizations.Default;
 
 
-                // TODO Delete after debugging
-                GameObject slotMachine = objab.transform.Find("slot").gameObject;
-                slotMachine.AddComponent<SlotHandler>();
+                // Add in lighting objects
+                GameObject flysPrefab = GameObject.Find("_Scenery/lamp_flys/flys").gameObject;
+                GameObject lightPrefab = GameObject.Find("_Scenery/point_light/HeroLight 3").gameObject;
 
-                Log.Warning("Gate Set up");
+                var go = GameObject.Instantiate(flysPrefab);
+                go.transform.parent = GameObject.Find("casino/lamp_post/light_marker_1").gameObject.transform;
+                go.SetActive(true);
+                go.transform.localPosition = new UnityEngine.Vector3(0f, 0f, -0.1f);
+
+                go = GameObject.Instantiate(flysPrefab);
+                go.transform.parent = GameObject.Find("casino/lamp_post/light_marker_2").gameObject.transform;
+                go.SetActive(true);
+                go.transform.localPosition = new UnityEngine.Vector3(0f, 0f, -0.1f);
+
+                go = GameObject.Instantiate(lightPrefab);
+                go.transform.parent = GameObject.Find("casino/lamp_post/light_marker_1").gameObject.transform;
+                go.SetActive(true);
+                go.transform.localPosition = new UnityEngine.Vector3(0f, 0f, -1f);
+
+                go = GameObject.Instantiate(lightPrefab);
+                go.transform.parent = GameObject.Find("casino/lamp_post/light_marker_2").gameObject.transform;
+                go.SetActive(true);
+                go.transform.localPosition = new UnityEngine.Vector3(0f, 0f, -1f);
+
+                // Move gate infront of building
+                GameObject.Find("_Scenery/town_layered/town_layered_0006_31").gameObject.transform.localPosition = new UnityEngine.Vector3(-16f, 2.5f, -1.25f);
+
+                Log.Warning("Casino town asset set up");
             }
             else
             {
@@ -125,7 +148,6 @@ namespace CasinoKnight
         // https://radiance.synthagen.net/apidocs/_images/Assets.html?highlight=getexecutingassembly#using-our-loaded-stuff
         private void ResetPrefabMaterials(GameObject obj)
         {
-            //StratosLogging.Log.Info("Setting material of " + obj.name);
             for (int i = 0; i < obj.transform.childCount; i++)
             {
                 GameObject child = obj.transform.GetChild(i).gameObject;

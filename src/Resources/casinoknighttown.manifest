@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 2343103608
+CRC: 1632150744
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 2a13c98a28695a82109b14d553fa91e7
+    Hash: f2c818077bd8d59477bd6476a0868188
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 7a8ec3e63123cd5310a7d69812fd612d
+    Hash: bcc8a439ff0726b0268144c29a3a97fa
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -21,18 +21,6 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 61
   Script: {instanceID: 0}
-- Class: 74
-  Script: {instanceID: 0}
-- Class: 82
-  Script: {instanceID: 0}
-- Class: 83
-  Script: {instanceID: 0}
-- Class: 91
-  Script: {instanceID: 0}
-- Class: 95
-  Script: {instanceID: 0}
-- Class: 114
-  Script: {fileID: 11500000, guid: b08840e83f9a04f4b98fc7361a3af46d, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 315b6d2463669124586f57520d2ce601, type: 3}
 - Class: 115
@@ -43,5 +31,5 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/Mod/Stratos.prefab
+- Assets/Mod/CasinoKnightTown.prefab
 Dependencies: []
