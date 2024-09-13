@@ -1,16 +1,5 @@
-﻿using GlobalEnums;
-using UnityEngine.UI;
-using Modding;
-using Modding.Menu;
-using Modding.Menu.Config;
+﻿using Modding;
 using Satchel.BetterMenus;
-
-using System;
-using UnityEngine;
-using MenuButton = Satchel.BetterMenus.MenuButton;
-using InControl;
-using StratosLogging;
-using Satchel;
 
 namespace CasinoKnight
 {

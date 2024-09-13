@@ -1,21 +1,11 @@
 ﻿using StratosLogging;
-using System;
-using System.Collections.Generic;
-using System.EnterpriseServices;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using GlobalEnums;
 using UnityEngine.SceneManagement;
-using Modding;
-using UObject = UnityEngine.Object;
 using System.Collections;
 using Satchel;
 using static Satchel.SceneUtils;
-using HutongGames.PlayMaker.Actions;
 
 namespace CasinoKnight
 {

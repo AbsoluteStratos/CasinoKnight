@@ -1,0 +1,10 @@
+ManifestFileVersion: 0
+CRC: 482775341
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: casinoscene
+      Dependencies: {}
+    Info_1:
+      Name: casinoknighttown
+      Dependencies: {}

@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using StratosLogging;
 using Satchel;
-using HutongGames.PlayMaker.Actions;
 using HutongGames.PlayMaker;
 using System.Collections;
 using System.Text.RegularExpressions;
@@ -128,6 +124,7 @@ namespace CasinoKnight
                 return;
             }
 
+            // Randomly sample slot reels and then play the animation to that item
             slotRunning = true;
             int[] values = new int[3];
             for (int i = 0; i <3; i++)
@@ -141,6 +138,7 @@ namespace CasinoKnight
                 animator.Play("Start");
             }
 
+            // Check to see if output is a winning payout via regex
             int payout = -bet;
             string value_pattern = String.Format("{0}{1}{2}", values[0], values[1], values[2]);
             Log.Info("Slot pattern: " + value_pattern);

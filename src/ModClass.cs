@@ -1,19 +1,7 @@
 ﻿using Modding;
 using Satchel.BetterMenus;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UObject = UnityEngine.Object;
-using StratosLogging;
-using System.IO;
-using System.Reflection;
-using Satchel;
-using UnityEngine.Events;
-using UnityEngine.SceneManagement;
-using HutongGames.PlayMaker.Actions;
-using GlobalEnums;
-using static Satchel.SceneUtils;
 
 namespace CasinoKnight
 {
@@ -27,27 +15,10 @@ namespace CasinoKnight
         internal static CasinoKnight Instance;
 
         public Dictionary<string, Dictionary<string, GameObject>> preloads;
-        public static Satchel.Core SatchelCore = new Satchel.Core();
-
-        public static AssetBundle casinoScene;
-        public string sceneName;
 
         private CasinoInterior casinoInterior;
         private CasinoExterior casinoExterior;
         private Menu MenuRef;
-
-        //public override List<ValueTuple<string, string>> GetPreloadNames()
-        //{
-        //    return new List<ValueTuple<string, string>>
-        //    {
-        //        new ValueTuple<string, string>("White_Palace_18", "White Palace Fly")
-        //    };
-        //}
-
-        //public CasinoKnight() : base("CasinoKnight")
-        //{
-        //    Instance = this;
-        //}
 
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
         {
@@ -93,13 +64,11 @@ namespace CasinoKnight
 
         public void OnHeroUpdate()
         {
-
             /*if (Input.GetKeyDown(KeyCode.J))
             {
                 HeroController.instance.AddGeo(100);
             }*/
-            // Here we use the Player Action to detect the input
-            // This WasPressed is defined in the subclass `OneAxisInputControl`
+            // Debugging / Dev util for jumping to new scene
             /*if (Input.GetKeyDown(KeyCode.O))
             {
                 // Quick jump to casino for testing, remove
@@ -128,12 +97,6 @@ namespace CasinoKnight
             return GS;
         }
 
-        /// <summary>
-        /// Get mode menu, required for Stachel better menu interface
-        /// </summary>
-        /// <param name="modListMenu"></param>
-        /// <param name="modtoggledelegates"></param>
-        /// <returns></returns>
         public MenuScreen GetMenuScreen(MenuScreen modListMenu, ModToggleDelegates? modtoggledelegates)
         {
             if (MenuRef == null)

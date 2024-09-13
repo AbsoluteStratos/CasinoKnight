@@ -1,18 +1,10 @@
 ﻿using GlobalEnums;
 using StratosLogging;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Numerics;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static GameManager;
 using Satchel;
 using Modding;
 
@@ -157,7 +149,6 @@ namespace CasinoKnight
                 Log.Info(tobj.name + " to: " + tobj.targetScene + " _ " + tobj.entryPoint);
             }
         }
-
     }
 
     public class CasinoTownDoorHandler : MonoBehaviour
@@ -175,7 +166,6 @@ namespace CasinoKnight
             heroAnim = HeroController.instance.GetComponent<tk2dSpriteAnimator>();
             doorArrowPrompt = CreatePromptPrehab();
             doorArrowPrompt.SetActive(true);
-
         }
 
         private GameObject CreatePromptPrehab(string text = "SLOTS")
