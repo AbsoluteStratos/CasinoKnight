@@ -41,6 +41,7 @@ Coming soon, maybe
 ```
 CasinoKnight
 ├── bin                     # Compiled project files
+├── docs                    # Documentation files
 ├── etc                     # Miscellaneous stuff
 ├── src                     # Source folder
 │   ├── Resources           # Packed asset bundles
