@@ -2,6 +2,9 @@
 
 [![Discord](https://img.shields.io/discord/879125729936298015.svg?logo=discord&logoColor=white&logoWidth=20&labelColor=7289DA&label=Discord&color=17cf48)](https://discord.gg/F6Y5TeFQ8j) ![OS](https://img.shields.io/badge/os-windows-blue) [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
+<p align="center">
+  <img src="https://github.com/AbsoluteStratos/CasinoKnight/blob/main/docs/demo_small.gif" alt="Demo gif"/>
+</p>
 
 Lets go gambling!
 This mod adds in a new casino building with two slot machines in Dirtmouth where our addicted hero can waste all his geo.
