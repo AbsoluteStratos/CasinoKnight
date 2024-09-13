@@ -6,7 +6,7 @@
   <img src="https://github.com/AbsoluteStratos/CasinoKnight/blob/main/docs/demo_small.gif" alt="Demo gif"/>
 </p>
 
-Lets go gambling!
+Let's go gambling!
 This mod adds in a new casino building with two slot machines in Dirtmouth where our addicted hero can waste all his geo.
 Will you win it big?
 
@@ -23,7 +23,7 @@ This mod has the following features:
 - Creating a new gate from an existing scene to a new scene, including a door way
 - Combining custom assets with pre-loaded in-game assets
 - Bootstrapping pre-loaded game asset FSM graphs to create custom behavior
-- Ingrating complex sprite animations using unity animator controllers and scripting 
+- Integrating complex sprite animations using unity animator controllers and scripting 
 
 ## Documentation
 
@@ -57,6 +57,7 @@ CasinoKnight
 
 ## Resources
 
+- [Modding Docs](https://prashantmohta.github.io/ModdingDocs/)
 - [Hollow Knight Scene Names](https://drive.google.com/drive/folders/1VwVbCjU8uPV4V3cDu_Tr1TgEs01hMSFr)
 - [Hollow Knight Sprite Database](https://drive.google.com/drive/folders/1lx02_w9TFTYdR3aggI1gbXcLr69roaNV)
 - [OG NewScene Docs](https://radiance.synthagen.net/apidocs/_images/NewScene.html)
