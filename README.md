@@ -22,6 +22,14 @@ This mod has the following features:
 - Bootstrapping pre-loaded game asset FSM graphs to create custom behavior
 - Ingrating complex sprite animations using unity animator controllers and scripting 
 
+## Documentation
+
+Coming soon, maybe
+
+## Code Walkthrough
+
+Coming soon, maybe
+
 ## Repository Layout
 
 ```
