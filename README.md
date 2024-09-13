@@ -27,7 +27,7 @@ This mod has the following features:
 Some rough notes taken documenting various items:
 
 - [Adding a new object into a existing scene from Unity](./docs/modify_scene_unity.md)
-- [Adding a new scene from Unity](./docs/modify_scene_unity.md)
+- [Adding a new scene from Unity](./docs/new_scene_unity.md)
 
 ## Code Walkthrough
 
