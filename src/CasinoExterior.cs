@@ -231,7 +231,7 @@ namespace CasinoKnight
                 {
                     StratosLogging.Log.Info(obj.transform.parent.name);
                 }*/
-
+                door_active = false;
                 // Trigger a scene transition
                 gm.BeginSceneTransition(new GameManager.SceneLoadInfo
                 {
@@ -247,7 +247,6 @@ namespace CasinoKnight
                 });
                 // Must be after, the Begin transition will cancel animation if before
                 HeroController.instance.StartCoroutine(PlayExitAnimation());
-                door_active = false;
             }
         }
 
