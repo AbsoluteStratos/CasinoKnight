@@ -1,4 +1,5 @@
-﻿using Modding;
+﻿using GlobalEnums;
+using Modding;
 using Satchel.BetterMenus;
 using System.Collections.Generic;
 using UnityEngine;

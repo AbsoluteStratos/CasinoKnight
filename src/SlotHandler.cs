@@ -132,6 +132,8 @@ namespace CasinoKnight
                 int reel_index = rand.Next(0, ReelMaps[i].Length); // Index slot on reel
                 values[i] = ReelMaps[i][reel_index];
 
+                // Good reference video
+                // https://www.youtube.com/watch?v=nBkiSJ5z-hE
                 var animator = ReelObjs[i].GetComponent<Animator>();
                 animator.SetInteger("PREV", animator.GetInteger("VALUE"));
                 animator.SetInteger("VALUE", values[i]);

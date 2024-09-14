@@ -21,9 +21,9 @@ This mod has the following features:
 - Modifying an existing scene by loading in a asset bundle exported from Unity
 - Creating a new scene loaded from an asset bundle exported from Unity
 - Creating a new gate from an existing scene to a new scene, including a door way
-- Combining custom assets with pre-loaded in-game assets
-- Bootstrapping pre-loaded game asset FSM graphs to create custom behavior
-- Integrating complex sprite animations using unity animator controllers and scripting 
+- Development pattern for using existing HK game assets inside your mod
+- Development pattern for modifying HK game assets via FSM graphs to create custom behavior
+- Integrating complex sprite animations using Unity animator controllers and scripting 
 
 ## Documentation
 
