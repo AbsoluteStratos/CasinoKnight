@@ -53,7 +53,7 @@ CasinoKnight
 │   ├── CasinoInterior.cs   # Casino interior loading and logic 
 │   ├── SlotHandler.cs      # Slot machine logic and behavior
 │   └── CasinoKnight.csproj # C# project file
-└── FartKnight.sln          # Visual Studio solution file
+└── CasinoKnight.sln        # Visual Studio solution file
 ```
 
 ## Resources
