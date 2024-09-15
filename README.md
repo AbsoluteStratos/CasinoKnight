@@ -34,7 +34,11 @@ Some rough notes taken documenting various items:
 
 ## Code Walkthrough
 
-Coming soon, maybe
+Interested in the code / mod development but need some help?
+Check out the walkthrough video which provides a more detailed break down of each feature (click the image :rocket:):
+
+[![Hollow Knight Mod Walkthrough](./docs/thumbnail.jpg)](https://www.youtube.com/watch?v=DGe_5f0l640)
+
 
 ## Repository Layout
 
