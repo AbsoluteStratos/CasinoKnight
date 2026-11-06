@@ -80,6 +80,9 @@ namespace CasinoKnight
 
     public class SlotHandler : MonoBehaviour
     {
+		public const int BET_STEP_LOW = 10;
+		public const int BET_STEP_HIGH = 100;
+		public int betStep = BET_STEP_LOW;
         internal GameObject[] ReelObjs = new GameObject[3];
         internal Dictionary<int, int[]> ReelMaps = new Dictionary<int, int[]>()
         {
@@ -108,6 +111,16 @@ namespace CasinoKnight
         private AudioSource win_sfx, lose_sfx, spin_sfx;
         private int bet = 10;
         private bool slotRunning = false;
+		private bool isPlayerNear = false;
+		
+		/// <summary>
+		/// Configura la apuesta inicial y el incremento/decremento de esta máquina.
+		/// </summary>
+		public void ConfigureBet(int initialBet, int step)
+		{
+			this.betStep = step;
+			this.BetAmount = initialBet;
+		}
 
 		private void Awake()
 		{
@@ -136,6 +149,28 @@ namespace CasinoKnight
 			CustomArrowPrompt.GetAddCustomArrowPrompt(arrowPrompt, String.Format("Bet {0}", bet), null);
 			arrowPrompt.SetActive(true);
 		}
+		
+		private void Update()
+		{
+			if (isPlayerNear && !slotRunning)
+			{
+				// Flecha Arriba: Aumenta según el paso de la máquina
+				if (Input.GetKeyDown(KeyCode.UpArrow))
+				{
+					BetAmount += betStep;
+				}
+				// Flecha Abajo: Disminuye según el paso, sin bajar de la apuesta inicial/mínima
+				else if (Input.GetKeyDown(KeyCode.DownArrow))
+				{
+					if (BetAmount > betStep)
+					{
+						BetAmount -= betStep;
+					}
+				}
+			}
+		}
+			
+			
 
         public void Play(FsmState state)
         {
@@ -216,31 +251,64 @@ namespace CasinoKnight
 			yield break;
 		}
 
-        void OnTriggerStay2D(Collider2D other)
-        {
-            if (other.name == "Knight" && Mathf.Abs(other.attachedRigidbody.velocity.x) < 0.1)
-            {
-                arrowPrompt.GetComponent<CustomArrowPromptBehaviour>().Show();
-            }
-        }
+		void OnTriggerStay2D(Collider2D other)
+		{
+			if (other.name == "Knight")
+			{
+				isPlayerNear = true; // El jugador entró a la zona
+				
+				if (Mathf.Abs(other.attachedRigidbody.velocity.x) < 0.1)
+				{
+					arrowPrompt.GetComponent<CustomArrowPromptBehaviour>().Show();
+				}
+			}
+		}
 
-        void OnTriggerExit2D(Collider2D other)
-        {
-            if (other.name == "Knight")
-            {
-                arrowPrompt.GetComponent<CustomArrowPromptBehaviour>().Hide();
-            }
-        }
+		void OnTriggerExit2D(Collider2D other)
+		{
+			if (other.name == "Knight")
+			{
+				isPlayerNear = false; // El jugador salió de la zona
+				arrowPrompt.GetComponent<CustomArrowPromptBehaviour>().Hide();
+			}
+		}
 
-        public int BetAmount
-        {
-            get => this.bet;
-            set
-            {
-                this.bet = value;
-                CustomArrowPromptBehaviour prompt = this.arrowPrompt.GetComponent<CustomArrowPromptBehaviour>();
-                prompt.PromptText = String.Format("Bet {0}", value);
-            }
-        }
+		public int BetAmount
+		{
+			get => this.bet;
+			set
+			{
+				// Si la máquina tiene el incremento por defecto (10) y desde afuera 
+				// le asignan una nueva apuesta base (ej. 100), ajustamos el incremento automáticamente.
+				if (this.bet == 10 && this.betStep == 10 && value > 10)
+				{
+					this.betStep = value;
+				}
+
+				this.bet = value;
+				
+				// Evitamos errores de NullReference si el otro script cambia el BetAmount 
+				// antes de que se ejecute la función Awake() de esta máquina.
+				if (this.arrowPrompt != null)
+				{
+					CustomArrowPromptBehaviour prompt = this.arrowPrompt.GetComponent<CustomArrowPromptBehaviour>();
+					string nuevoTexto = String.Format("Bet {0}", value);
+					
+					if (prompt != null)
+					{
+						prompt.PromptText = nuevoTexto;
+					}
+					
+					if (isPlayerNear)
+					{
+						var textMesh = this.arrowPrompt.GetComponentInChildren<TMPro.TextMeshPro>();
+						if (textMesh != null)
+						{
+							textMesh.text = nuevoTexto;
+						}
+					}
+				}
+			}
+		}
     }
 }
