@@ -20,10 +20,8 @@ namespace CasinoKnight
         private static Satchel.Core satchelCore = new Satchel.Core();
         private static string sceneResourceName = "CasinoKnight.Resources.casinoscene";
 
-
         public CasinoInterior(GameObject refTileMap, GameObject refSceneManager, GameObject heroLight, GameObject flys)
         {
-            // Load scene bundle
             Assembly asm = Assembly.GetExecutingAssembly();
             using (Stream s = asm.GetManifestResourceStream(sceneResourceName))
             {
@@ -35,23 +33,16 @@ namespace CasinoKnight
             }
             sceneNamePath = casinoBundle.GetAllScenePaths()[0];
 
-            // Use Satchel to create a custome scene
-            // https://github.com/PrashantMohta/Satchel/blob/master/Core.cs#L177
             casinoInterior = satchelCore.GetCustomScene("CasinoScene", refTileMap, refSceneManager);
             casinoInterior.OnLoaded += SceneOnload;
 
-            // Can edit properties in the settings object, will by default use the value in the reference scene manager
-            // which is the mappers store room in this case
-            // https://github.com/PrashantMohta/Satchel/blob/master/Utils/SceneUtils.cs#L36
             CustomSceneManagerSettings settings = new SceneUtils.CustomSceneManagerSettings(refSceneManager.GetComponent<SceneManager>());
             settings.saturation = 1.2f;
             settings.heroLightColor = new Color(1.0f, 0.28f, 0.3f, 0.05f);
             casinoInterior.Config(40, 25, settings);
-            // Satchel will handle set up of the scene manager, but we need our own call back for modifying objects
-            // Add call back to load the scene on change
+            
             UnityEngine.SceneManagement.SceneManager.activeSceneChanged += OnSceneChange;
 
-            // Store preloaded fabs
             heroLightPrefab = heroLight;
             flysPrefab = flys;
         }
@@ -63,12 +54,10 @@ namespace CasinoKnight
             {
                 ResetPrefabMaterials(GameObject.Find("root"));
                 Log.Info("Casino interior scene change");
-                // Manually replicating because I already have game objects in the scene
-                // https://github.com/PrashantMohta/Satchel/blob/master/Utils/SceneUtils.cs#L144
+
                 GameObject gate = GameObject.Find("left_01").gameObject;
                 var tp = gate.AddComponent<TransitionPoint>();
 
-                // See Casino Exterior for linked Gate
                 tp.isADoor = false;
                 tp.SetTargetScene("Town");
                 tp.entryPoint = "door_casino";
@@ -85,6 +74,10 @@ namespace CasinoKnight
                 GameObject speaker = GameObject.Find("EnterSpeaker").gameObject;
                 speaker.AddComponent<AudioBehavior>();
                 Log.Info("Speaker Set Up");
+
+                // Instanciar controlador de música en bucle para el casino
+                GameObject musicObj = new GameObject("CasinoMusicManager");
+                musicObj.AddComponent<CasinoMusic>();
 
                 // Initialize the slot machines
                 GameObject slotMachine = GameObject.Find("root/slot_10").gameObject;
@@ -113,10 +106,8 @@ namespace CasinoKnight
             Log.Info("Casino Scene loading complete");
         }
 
-        // https://radiance.synthagen.net/apidocs/_images/Assets.html?highlight=getexecutingassembly#using-our-loaded-stuff
         private void ResetPrefabMaterials(GameObject obj)
         {
-            //StratosLogging.Log.Info("Setting material of " + obj.name);
             for (int i = 0; i < obj.transform.childCount; i++)
             {
                 GameObject child = obj.transform.GetChild(i).gameObject;
@@ -127,23 +118,93 @@ namespace CasinoKnight
                 ResetPrefabMaterials(child);
             }
         }
-
     }
 
-    public class AudioBehavior : MonoBehaviour
+	public class AudioBehavior : MonoBehaviour
+	{
+		private void Start()
+		{
+			if (CasinoKnight.GS.EnableSFX)
+			{
+				AudioSource sfx = GetComponent<AudioSource>();
+				
+				StartCoroutine(AudioLoader.LoadOgg("intro.ogg", clip => 
+				{
+					if (clip != null && sfx != null)
+					{
+						sfx.clip = clip;
+						StartCoroutine(PlayIntroAudio(sfx));
+					}
+				}));
+			}
+		}
+
+		IEnumerator PlayIntroAudio(AudioSource sfx)
+		{
+			if (sfx != null && sfx.clip != null)
+			{
+				sfx.Play();
+				yield return new WaitForSeconds(sfx.clip.length);
+			}
+			yield break;
+		}
+	}
+
+	public class CasinoMusic : MonoBehaviour
     {
+        private AudioSource bgmSource;
+        private AudioSource[] originalMusicSources;
+        private float[] originalVolumes;
+
         private void Start()
         {
-            if (CasinoKnight.GS.EnableSFX)
+            bgmSource = gameObject.AddComponent<AudioSource>();
+            bgmSource.loop = true;
+
+            // Encontrar y silenciar la música original del juego
+            if (GameManager.instance != null && GameManager.instance.AudioManager != null)
             {
-                StartCoroutine(PlayIntroAudio(GameObject.Find("EnterSpeaker").GetComponent<AudioSource>()));
+                // Buscamos los AudioSources que dependen del AudioManager
+                originalMusicSources = GameManager.instance.AudioManager.GetComponentsInChildren<AudioSource>();
+                originalVolumes = new float[originalMusicSources.Length];
+
+                for (int i = 0; i < originalMusicSources.Length; i++)
+                {
+                    originalVolumes[i] = originalMusicSources[i].volume;
+                    originalMusicSources[i].volume = 0f; // Silenciamos
+                }
             }
+
+            // Cargar y reproducir music.ogg
+            StartCoroutine(AudioLoader.LoadOgg("music.ogg", clip =>
+            {
+                if (clip != null && bgmSource != null)
+                {
+                    bgmSource.clip = clip;
+                    bgmSource.volume = 1f;
+                    bgmSource.Play();
+                }
+            }));
         }
-        IEnumerator PlayIntroAudio(AudioSource sfx)
+
+        private void OnDestroy()
         {
-            sfx.Play();
-            yield return new WaitForSeconds(sfx.clip.length);
-            yield break;
+            if (bgmSource != null && bgmSource.isPlaying)
+            {
+                bgmSource.Stop();
+            }
+
+            // Restaurar la música original al salir
+            if (originalMusicSources != null && originalVolumes != null)
+            {
+                for (int i = 0; i < originalMusicSources.Length; i++)
+                {
+                    if (originalMusicSources[i] != null)
+                    {
+                        originalMusicSources[i].volume = originalVolumes[i];
+                    }
+                }
+            }
         }
     }
 }

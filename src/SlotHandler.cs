@@ -1,11 +1,11 @@
 using System;
-using System.Collections.Generic;
-using UnityEngine;
-using StratosLogging;
-using Satchel;
-using HutongGames.PlayMaker;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using HutongGames.PlayMaker;
+using Satchel;
+using StratosLogging;
+using UnityEngine;
 
 namespace CasinoKnight
 {
@@ -13,8 +13,6 @@ namespace CasinoKnight
     {
         public static GameObject LeverPrefab;
 
-        // Preloaded ["Ruins1_23"]["Lift Call Lever"]
-        // https://github.com/PrashantMohta/Satchel/blob/master/Custom/CustomArrowPrompt.cs 
         public static void Prepare(GameObject lever)
         {
             LeverPrefab = lever;
@@ -24,24 +22,18 @@ namespace CasinoKnight
         {
             if (LeverPrefab == null)
             {
-                Log.Error("LeverPrefab not set. Set to Town/Mines Lever");
+                Log.Error("LeverPrefab not set.");
             }
 
             Log.Info("Creating lever!");
             var go = GameObject.Instantiate(LeverPrefab);
             go.name = name;
 
-            // Interesting FSM editting reference
-            // https://github.com/SFGrenade/TestOfTeamwork/blob/f2fb8212fa4cc2a725c29e57ca5e2675383adc82/src/MonoBehaviours/WeaverPrincessBossIntro.cs#L45
             PlayMakerFSM fsm = go.LocateMyFSM("Call Lever");
 
-            // "Check Already Called" intenta buscar el FSM "Lift Control" en un GameObject
-            // "Lift" que no existe en la escena del casino → crash. Saltamos ese estado
-            // redirigiendo Left y Right directamente a "Send Msg".
             Satchel.FsmUtil.ChangeTransition(fsm, "Left", "FINISHED", "Send Msg");
             Satchel.FsmUtil.ChangeTransition(fsm, "Right", "FINISHED", "Send Msg");
 			
-			// NUEVA SOLUCIÓN: Aislar el estado problemático redirigiendo todas las transiciones
 			foreach (var s in fsm.FsmStates)
 			{
 				foreach (var t in s.Transitions)
@@ -53,8 +45,9 @@ namespace CasinoKnight
 				}
 			}
 
-            var call_state = fsm.GetState("Send Msg");
-			// Buscar y eliminar acciones de PlayMaker que apunten a FSM externas que no existen
+            //var call_state = fsm.GetState("Send Msg");
+			var call_state = Satchel.FsmUtil.GetValidState(fsm, "Send Msg");
+			
             foreach (var state in fsm.FsmStates)
             {
                 var cleanActions = new List<HutongGames.PlayMaker.FsmStateAction>();
@@ -68,21 +61,18 @@ namespace CasinoKnight
                 state.Actions = cleanActions.ToArray();
             }
    
-            // Remove elevator call action
             if (call_state.Actions.Length > 2)
 			{
 				Satchel.FsmUtil.RemoveAction(call_state, 2);
 			}
-            // https://github.com/PrashantMohta/Satchel/blob/2e922c2939ae35af0a256b5edd1792db0dbf0c92/Futils/FsmUtils.cs#L340
+
             Satchel.FsmUtil.AddCustomAction(call_state, () =>
             {
                 Log.Debug(go.name.ToString() + " hit!");
                 fsm.FsmVariables.BoolVariables[0] = true;
                 OnLeverHit(call_state);
                 fsm.FsmVariables.BoolVariables[0] = false;
-
-            }
-            );
+            });
 
             return go;
         }
@@ -90,7 +80,6 @@ namespace CasinoKnight
 
     public class SlotHandler : MonoBehaviour
     {
-        
         internal GameObject[] ReelObjs = new GameObject[3];
         internal Dictionary<int, int[]> ReelMaps = new Dictionary<int, int[]>()
         {
@@ -116,35 +105,37 @@ namespace CasinoKnight
 
         internal GameObject arrowPrompt;
 
-        private AudioSource win_sfx, lose_sfx;
+        private AudioSource win_sfx, lose_sfx, spin_sfx;
         private int bet = 10;
-        private bool slotRunning = false; // If slot is currently running
-        private void Awake()
-        {
-            // Initialize
-            ReelObjs[0] = gameObject.transform.Find("machine/reel0").gameObject;
-            ReelObjs[1] = gameObject.transform.Find("machine/reel1").gameObject;
-            ReelObjs[2] = gameObject.transform.Find("machine/reel2").gameObject;
+        private bool slotRunning = false;
 
-            win_sfx = gameObject.transform.Find("machine/win_sfx").gameObject.GetComponent<AudioSource>();
-            lose_sfx = gameObject.transform.Find("machine/lose_sfx").gameObject.GetComponent<AudioSource>();
+		private void Awake()
+		{
+			ReelObjs[0] = gameObject.transform.Find("machine/reel0").gameObject;
+			ReelObjs[1] = gameObject.transform.Find("machine/reel1").gameObject;
+			ReelObjs[2] = gameObject.transform.Find("machine/reel2").gameObject;
 
-            // Needs preloads["Ruins1_23"]["Lift Call Lever"]; on mod init
-            var lever = SlotLever.GetNewLever("slot_lever", Play);
-            lever.SetActive(true);
-            lever.SetScale(0.7f, 0.7f);
-            lever.transform.parent = gameObject.transform;
-            lever.transform.localPosition = new Vector3(0f, -1.25f, 0f);
-            Log.Info("Lever pos" + lever.transform.position.ToString() + gameObject.transform.position.ToString());
+			win_sfx = gameObject.transform.Find("machine/win_sfx").gameObject.GetComponent<AudioSource>();
+			lose_sfx = gameObject.transform.Find("machine/lose_sfx").gameObject.GetComponent<AudioSource>();
+            
+            // AudioSource para el sonido del giro de la máquina
+            spin_sfx = gameObject.AddComponent<AudioSource>();
 
-            // Needs preloads["Cliffs_01"]["Cornifer Card"]; on mod init
-            // Assumes CustomArrowPrompt.Prepare(CardPrefab); has been called
-            // https://github.com/PrashantMohta/Satchel/blob/2e922c2939ae35af0a256b5edd1792db0dbf0c92/Custom/CustomArrowPrompt.cs
-            arrowPrompt = gameObject.transform.Find("prompt_marker").gameObject;
-            CustomArrowPrompt.GetAddCustomArrowPrompt(arrowPrompt, String.Format("Bet {0}", bet), null);
-            arrowPrompt.SetActive(true);
-            Log.Info("arrow prompt updated");
-        }
+			// Cargar audios .ogg externos
+			StartCoroutine(AudioLoader.LoadOgg("spin.ogg", clip => { if (spin_sfx != null) spin_sfx.clip = clip; }));
+			StartCoroutine(AudioLoader.LoadOgg("win.ogg", clip => { if (win_sfx != null) win_sfx.clip = clip; }));
+			StartCoroutine(AudioLoader.LoadOgg("lose.ogg", clip => { if (lose_sfx != null) lose_sfx.clip = clip; }));
+
+			var lever = SlotLever.GetNewLever("slot_lever", Play);
+			lever.SetActive(true);
+			lever.SetScale(0.7f, 0.7f);
+			lever.transform.parent = gameObject.transform;
+			lever.transform.localPosition = new Vector3(0f, -1.25f, 0f);
+
+			arrowPrompt = gameObject.transform.Find("prompt_marker").gameObject;
+			CustomArrowPrompt.GetAddCustomArrowPrompt(arrowPrompt, String.Format("Bet {0}", bet), null);
+			arrowPrompt.SetActive(true);
+		}
 
         public void Play(FsmState state)
         {
@@ -152,29 +143,33 @@ namespace CasinoKnight
             if (slotRunning)
             {
                 return;
-            } else if (numGeo < bet)
+            } 
+            else if (numGeo < bet)
             {
                 Log.Error("Not enough money!");
                 return;
             }
 
-            // Randomly sample slot reels and then play the animation to that item
             slotRunning = true;
-            int[] values = new int[3];
-            for (int i = 0; i <3; i++)
+
+            // Reproduce el sonido de la animación de girar
+            if (CasinoKnight.GS.EnableSFX && spin_sfx != null && spin_sfx.clip != null)
             {
-                int reel_index = rand.Next(0, ReelMaps[i].Length); // Index slot on reel
+                spin_sfx.Play();
+            }
+
+            int[] values = new int[3];
+            for (int i = 0; i < 3; i++)
+            {
+                int reel_index = rand.Next(0, ReelMaps[i].Length);
                 values[i] = ReelMaps[i][reel_index];
 
-                // Good reference video
-                // https://www.youtube.com/watch?v=nBkiSJ5z-hE
                 var animator = ReelObjs[i].GetComponent<Animator>();
                 animator.SetInteger("PREV", animator.GetInteger("VALUE"));
                 animator.SetInteger("VALUE", values[i]);
                 animator.Play("Start");
             }
 
-            // Check to see if output is a winning payout via regex
             int payout = -bet;
             string value_pattern = String.Format("{0}{1}{2}", values[0], values[1], values[2]);
             Log.Info("Slot pattern: " + value_pattern);
@@ -187,41 +182,39 @@ namespace CasinoKnight
                 }
             }
             
-            // Start payout coroutine
             StartCoroutine(SlotPayoutCoroutine(payout));
         }
 
-        IEnumerator SlotPayoutCoroutine(int payout)
-        {
-            //yield on a new YieldInstruction that waits for 0.5 for animation to finish.
-            yield return new WaitForSeconds(1.25f);
+		IEnumerator SlotPayoutCoroutine(int payout)
+		{
+			yield return new WaitForSeconds(1.25f);
 
-            slotRunning = false;
-            // For geo utils see the following reference:
-            // https://github.com/dpinela/Transcendence/blob/aa075856eabeffc5ba0c4e3c09aab5309229e905/Transcendence/Charms/MillibellesBlessing.cs#L26
-            if (payout > 0)
-            {
-                Log.Info("Win Payout: " + payout.ToString());
-                HeroController.instance.AddGeo(payout);
-                if (CasinoKnight.GS.EnableSFX)
-                {
-                    win_sfx.Play();
-                    yield return new WaitForSeconds(win_sfx.clip.length);
-                }
-            }
-            else
-            {
-                Log.Info("Loss Payout: " + payout.ToString());
-                HeroController.instance.TakeGeo(-payout);
-                if (CasinoKnight.GS.EnableSFX)
-                {
-                    lose_sfx.Play();
-                    yield return new WaitForSeconds(lose_sfx.clip.length);
-                }
-            }
-            
-            yield break;
-        }
+			slotRunning = false;
+			if (payout > 0)
+			{
+				Log.Info("Win Payout: " + payout.ToString());
+				HeroController.instance.AddGeo(payout);
+				
+				if (CasinoKnight.GS.EnableSFX && win_sfx != null && win_sfx.clip != null)
+				{
+					win_sfx.Play();
+					yield return new WaitForSeconds(win_sfx.clip.length);
+				}
+			}
+			else
+			{
+				Log.Info("Loss Payout: " + payout.ToString());
+				HeroController.instance.TakeGeo(-payout);
+				
+				if (CasinoKnight.GS.EnableSFX && lose_sfx != null && lose_sfx.clip != null)
+				{
+					lose_sfx.Play();
+					yield return new WaitForSeconds(lose_sfx.clip.length);
+				}
+			}
+			
+			yield break;
+		}
 
         void OnTriggerStay2D(Collider2D other)
         {
@@ -241,10 +234,7 @@ namespace CasinoKnight
 
         public int BetAmount
         {
-            get
-            {
-                return this.bet;
-            }
+            get => this.bet;
             set
             {
                 this.bet = value;
