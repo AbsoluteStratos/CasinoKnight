@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using StratosLogging;
@@ -35,10 +35,44 @@ namespace CasinoKnight
             // https://github.com/SFGrenade/TestOfTeamwork/blob/f2fb8212fa4cc2a725c29e57ca5e2675383adc82/src/MonoBehaviours/WeaverPrincessBossIntro.cs#L45
             PlayMakerFSM fsm = go.LocateMyFSM("Call Lever");
 
+            // "Check Already Called" intenta buscar el FSM "Lift Control" en un GameObject
+            // "Lift" que no existe en la escena del casino → crash. Saltamos ese estado
+            // redirigiendo Left y Right directamente a "Send Msg".
+            Satchel.FsmUtil.ChangeTransition(fsm, "Left", "FINISHED", "Send Msg");
+            Satchel.FsmUtil.ChangeTransition(fsm, "Right", "FINISHED", "Send Msg");
+			
+			// NUEVA SOLUCIÓN: Aislar el estado problemático redirigiendo todas las transiciones
+			foreach (var s in fsm.FsmStates)
+			{
+				foreach (var t in s.Transitions)
+				{
+					if (t.ToState == "Check Already Called")
+					{
+						t.ToState = "Send Msg";
+					}
+				}
+			}
+
             var call_state = fsm.GetState("Send Msg");
+			// Buscar y eliminar acciones de PlayMaker que apunten a FSM externas que no existen
+            foreach (var state in fsm.FsmStates)
+            {
+                var cleanActions = new List<HutongGames.PlayMaker.FsmStateAction>();
+                foreach (var action in state.Actions)
+                {
+                    if (!(action is HutongGames.PlayMaker.Actions.SetFsmInt))
+                    {
+                        cleanActions.Add(action);
+                    }
+                }
+                state.Actions = cleanActions.ToArray();
+            }
    
             // Remove elevator call action
-            Satchel.FsmUtil.RemoveAction(call_state, 2);
+            if (call_state.Actions.Length > 2)
+			{
+				Satchel.FsmUtil.RemoveAction(call_state, 2);
+			}
             // https://github.com/PrashantMohta/Satchel/blob/2e922c2939ae35af0a256b5edd1792db0dbf0c92/Futils/FsmUtils.cs#L340
             Satchel.FsmUtil.AddCustomAction(call_state, () =>
             {

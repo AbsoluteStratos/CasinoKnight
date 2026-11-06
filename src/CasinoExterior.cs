@@ -1,4 +1,4 @@
-﻿using GlobalEnums;
+using GlobalEnums;
 using StratosLogging;
 using System.Collections;
 using System.IO;
@@ -124,6 +124,7 @@ namespace CasinoKnight
             {
                 Log.Info("Unloading asset");
                 cassinoBundle.Unload(true);
+                cassinoBundle = null;
             }
         }
 
@@ -166,6 +167,15 @@ namespace CasinoKnight
             heroAnim = HeroController.instance.GetComponent<tk2dSpriteAnimator>();
             doorArrowPrompt = CreatePromptPrehab();
             doorArrowPrompt.SetActive(true);
+        }
+
+        private void OnDestroy()
+        {
+            ModHooks.HeroUpdateHook -= OnHeroUpdate;
+            if (doorArrowPrompt != null)
+            {
+                Destroy(doorArrowPrompt);
+            }
         }
 
         private GameObject CreatePromptPrehab(string text = "SLOTS")
