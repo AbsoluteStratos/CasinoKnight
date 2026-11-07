@@ -1,4 +1,4 @@
-﻿using GlobalEnums;
+using GlobalEnums;
 using Modding;
 using Satchel.BetterMenus;
 using System.Collections.Generic;
@@ -28,7 +28,8 @@ namespace CasinoKnight
             Instance = this;
 
             ModHooks.HeroUpdateHook += OnHeroUpdate;
-
+			ModHooks.LanguageGetHook += OnLanguageGet;
+			
             // Prepare classes from preloaded objects
             // https://github.com/PrashantMohta/Smolknight/blob/6a6253ca3ea6549cc17bff47c33ade2ac28054e7/Smolknight.cs#L134
             // Arrow prompt
@@ -55,7 +56,6 @@ namespace CasinoKnight
             {
                 ("Cliffs_01","Cornifer Card"),
                 ("Room_mapper","TileMap"),
-                ("Room_mapper","TileMap Render Data"),
                 ("Room_mapper","_SceneManager"),
                 ("Town","_Scenery/lamp_flys/flys"),
                 ("Town", "_Scenery/point_light/HeroLight 3"),
@@ -112,9 +112,28 @@ namespace CasinoKnight
         public void Unload()
         {
             Log("Unloaded");
+            ModHooks.HeroUpdateHook -= OnHeroUpdate;
+			ModHooks.LanguageGetHook -= OnLanguageGet;
             casinoInterior = null;
             casinoExterior = null;
             
         }
+		
+		private string OnLanguageGet(string key, string sheetTitle, string orig)
+		{
+			// Si la clave solicitada por el CustomArrowPrompt empieza por "Bet "
+			if (!string.IsNullOrEmpty(key) && key.StartsWith("Bet "))
+			{
+				// Si quieres que dependa del idioma del juego, puedes hacer esto:
+				// if (Modding.ModHooks.GlobalSettings.Language == "ES") 
+				//     return key.Replace("Bet", "Apostar");
+				
+				// Devuelve el texto directamente para que no tire error
+				return key; 
+			}
+			
+			// Si es cualquier otro texto del juego, lo deja intacto
+			return orig;
+		}
     }
 }

@@ -1,10 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <!-- Change this to the path of your modded HK installation -->
-    <!-- <HollowKnightRefs>E:/GOG/Hollow Knight 1.5 Modded/Hollow Knight_Data/Managed/</HollowKnightRefs> -->
-	<HollowKnightRefs>C:\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed</HollowKnightRefs>
+    <HollowKnightRefs Condition="Exists('C:\GOG Games\Hollow Knight\Hollow Knight_Data\Managed')">C:\GOG Games\Hollow Knight\Hollow Knight_Data\Managed</HollowKnightRefs>
+    <HollowKnightRefs Condition="'$(HollowKnightRefs)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed</HollowKnightRefs>
     <!-- Change this to the path where you want the ready-to-upload exports to be -->
-	<ExportDir>C:\Users\$(USERNAME)\Documents\Hollow Knight Mods\CasinoKnight\bin</ExportDir>
+    <ExportDir Condition="Exists('$(MSBuildProjectDirectory)\..\bin')">$(MSBuildProjectDirectory)\..\bin</ExportDir>
+    <ExportDir Condition="'$(ExportDir)' == ''">C:\Users\$(USERNAME)\Documents\Hollow Knight Mods\CasinoKnight\bin</ExportDir>
     <!-- Uncomment this to generate a documentation file to be included with the mod -->
     <!--<DocumentationFile>$(OutputPath)/$(AssemblyTitle).xml</DocumentationFile>-->
   </PropertyGroup>
